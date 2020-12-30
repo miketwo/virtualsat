@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pytest
-import skeleton
+import satellite
 
 
 # Parameterized testing. Change the test cases to generate more.
@@ -12,4 +12,4 @@ import skeleton
     (5, 5, 10),
 ])
 def test_adder(test_input_a, test_input_b, expected):
-    assert skeleton.core.add_two_things(test_input_a, test_input_b) == expected
+    assert satellite.core.add_two_things(test_input_a, test_input_b) == expected

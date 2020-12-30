@@ -1,64 +1,60 @@
-# Python Skeleton
+# Virtual Satellite
 
-A sample Python module skeleton used to make TDD Python more easy. Works in both Docker and Virtualenv.
+## Getting Started
 
-![Hey there, Developer](https://cdn.pixabay.com/photo/2016/08/01/14/55/skeleton-1561177_640.png)
+Run main.py. Command the satellite with 1-letter commands.
 
-## Usage -- Docker
-
-This sets up a dev environment inside of docker. Changes made on the host will be immediately reflected.
-
-Pre-reqs: `docker`
-
-```
-# Download the repo
-git clone https://github.com/miketwo/python-skeleton.git
-cd python-skeleton
-
-# Build and run the container
-docker build -t my_container_name .
-docker run -it -v $(pwd):/app my_container_name
-
-# Start TDD -- this continouosly reruns tests as you develop
-make test
-
-# Now modify a test in `/tests` or the example code in `/skeleton/core.py`
-# to see the unit tests rerunning. Tada! TDD.
-```
-
-#### Note about caches
-Both python and pytest use caches to speed things up. If you are running the program or tests both inside and outside the container, these caches will conflict can each other. Whenever you switch environments, it's best to clear the cache by:
- - Running `find . -name \*.pyc -delete`
- - Using the `--cache-clear` option in pytest or manually deleting `__pycache__`
+ToDo:
+ - API interface
 
 
-## Usage -- Virtualenv
+## Design Principles
 
-This is a more traditional virtual environment setup.
+### STAY SIMPLE: 
+ - Operator must balance imaging, downlinking, and recharging.
+ 
+ - We must correctly simulate communication over a groundstation. The groundstation's lat/long can be included with each API call. That is used to determine if comms is possible. 
 
-Pre-reqs: `virtualenvwrapper`. (Try `sudo pip install virtualenvwrapper` -- it might work.)
+## Program properties
+
+State:
+  - Storage, Power, Position/Orbit, Command schedule, Telemetry History?
+
+Automatic:
+  - Telemetry is generated every XX seconds
+    -- There is a maximum amount that can be stored
+    -- Old telemetry is overwritten as newer stuff is added
+  - Power is gained/reduced every XX seconds
+    -- It costs power to take pics
+    -- Reaching 0 power causes a reboot. Lose all Pics and enter "safe mode" (recharging mode).
 
 
-```
-# Download the repo
-git clone https://github.com/miketwo/python-skeleton.git
-cd python-skeleton
+Imaging Commands: 
+  - Take pictures (straight down at current lat/long -- populate from Google Earth?)
+  - Pics are taken on a commanded window
+    -- Start time + duration
+    -- It costs power to take pics
+    -- There is a maximum amount that can be stored. Asking for more produces errors.
 
-# Create a virtual environment to work in
-mkvirtualenv PROGRAMNAME
-make init   # installs dependencies
+Power Commands: 
+  - It takes power to take downlink. Max battery XX Watt-hours. It takes 10 orbits to fully charge.
+  - Recharge Mode
+  - Normal Mode
 
-# Start TDD -- this continouosly reruns tests as you develop
-make test
+Comm Commands: 
+  - Downlink pics
+  - Downlink speed artificially limits to XX/2 per pass (i.e. It takes 2 passes to drain the storage entirely)
+  - Downlink telemetry (live or historical)
 
-# Now modify a test in `/tests` or the example code in `/skeleton/core.py`
-# to see the unit tests rerunning. Tada! TDD.
-```
+Schedule:
+  - Schedule a command (time, command)
+  - Cancel a scheduled command
 
-## Contributing
 
-Contributions are welcome! Just submit a PR.
+## Other notes
 
-## License
-
-Uses the [MIT](http://opensource.org/licenses/MIT) license.
+3rd Party?
+- There was a VirtualSat SBIR in 1998: https://sbir.nasa.gov/SBIR/abstracts/98/sbir/phase1/SBIR-98-1-13.11-5300.html
+- The Hammers Company made it: https://hammers.com/virtualsat
+- Not sure if we/they would be intersted in partnering?
+- Could be WAAY too high fidelity. The point is to demo Major Tom, not get lost in satellite functionality...

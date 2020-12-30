@@ -1,2 +1,5 @@
 pytest
 pytest-watch
+pyorbital
+requests
+apscheduler

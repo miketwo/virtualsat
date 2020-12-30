@@ -9,7 +9,7 @@ try:
 except ImportError:
     from distutils.core import setup
 
-import skeleton
+import satellite
 
 
 if sys.argv[-1] == 'publish':
@@ -21,7 +21,7 @@ with open(os.path.join(os.path.dirname(__file__), 'README.md')) as f:
     readme = f.read()
 
 packages = [
-    'skeleton',
+    'satellite',
 ]
 
 package_data = {
@@ -45,16 +45,16 @@ classifiers = [
 ]
 
 setup(
-    name='python-skeleton',
-    version=skeleton.__version__,
+    name='python-satellite',
+    version=satellite.__version__,
     description='Skeleton package for Python modules.',
     long_description=readme,
     packages=packages,
     package_data=package_data,
     install_requires=requires,
-    author=skeleton.__author__,
+    author=satellite.__author__,
     author_email='miketwo@gmail.com',
-    url='https://github.com/streeter/python-skeleton',
+    url='https://github.com/streeter/python-satellite',
     license='MIT',
     classifiers=classifiers,
 )
