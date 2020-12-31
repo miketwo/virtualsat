@@ -1,54 +1,94 @@
 # Virtual Satellite
 
-## Getting Started
+- Launch the satellite and go to localhost:PORT/debug to see the satellite status and TLEs
 
-Run main.py. Command the satellite with 1-letter commands.
+Level 1: Flatsat
+- Play with the satellite using the commands and buttons on debug. (Or MT interactive mode). Notice how power charges/discharges. Notice how pictures can be taken. Notice how if you run out of power, you lose all pictures. Notice how telemetry is created. Downlink as many pictures as you can.
+
+Level 2: Orbit
+- Now you need to schedule all your commands, using MT. Add the satellite to MT
+- Add a Groundstation (need to dockerize this as well)
+- Add a Gateway (?)
+- Schedule commands and downlink as many pictures as you can. 
+
+Level 3: Tbd... (more realism? manage thermal + other subsystems)
+
+
+
+## Quicktart
+Run `launchsat.sh`. Command the satellite with 1-letter commands:
+ - 'r' to recharge
+ - 'n' for normal mode
+ - 'p' for pics
+ - 'l' for list pics
+ - 'd' for download pic
+
 
 ToDo:
  - API interface
+ - Logging instead of prints
+ - Make docker work. Publish to registry.
+ - Interactive flatsat mode that ignores GS location?
 
 
 ## Design Principles
 
 ### STAY SIMPLE: 
- - Operator must balance imaging, downlinking, and recharging.
+ - Operator must balance Imaging, Downlinking, and Recharging.
  
  - We must correctly simulate communication over a groundstation. The groundstation's lat/long can be included with each API call. That is used to determine if comms is possible. 
 
+ - We must communicate with the satellite over a json API, not programmatically. The satellite code should be a black box.
+
+ - The groundstation must be extremely simple. Just adds its own location to the commands.
+
+ - It would be nice if they were each containers that talked to each other. It would also be nice if the GS and Satellite have no idea what Major Tom is, to better simulate interfacing with 3rd party systems.
+
+ - We need to connect to Major Tom (Gateway to GS?)
+
+
 ## Program properties
+The satellite keeps track of the following state:
+  - Onboard Storage, including
+    - Telemetry history
+    - Picture history
+  - Power, including
+    - "Mode" (recharging vs not)
+    - Number of Reboots
+  - Position/Orbit
+  - Command schedule
 
-State:
-  - Storage, Power, Position/Orbit, Command schedule, Telemetry History?
-
-Automatic:
+### Telemetry Subsystem
   - Telemetry is generated every XX seconds
-    -- There is a maximum amount that can be stored
-    -- Old telemetry is overwritten as newer stuff is added
-  - Power is gained/reduced every XX seconds
-    -- It costs power to take pics
-    -- Reaching 0 power causes a reboot. Lose all Pics and enter "safe mode" (recharging mode).
+    - There is a maximum amount that can be stored
+    - Old telemetry is overwritten as newer stuff is added
 
+### Power Subsystem
+ - Power is gained/reduced every XX seconds
+   - It costs extra power to take pics
+   - It costs extra power to downlink pics
+   - Reaching 0 power causes a reboot. Sat automatically switches to "recharge mode" 
+ - It takes XX orbits to recharge fully.
 
-Imaging Commands: 
+### Communication Subsystem
+  - Upload commands (scheduled or immediate)
+  - Downlink pics
+    - Downlink speed artificially limited (it takes 2 passes to drain storage)
+  - Downlink telemetry
+    - All TLM can be downloaded instantaneously
+
+### Scheduling Subsystem
+  - Schedule a command (time, command)
+  - Cancel a scheduled command
+
+### Imaging Subsystem
   - Take pictures (straight down at current lat/long -- populate from Google Earth?)
   - Pics are taken on a commanded window
     -- Start time + duration
     -- It costs power to take pics
     -- There is a maximum amount that can be stored. Asking for more produces errors.
-
-Power Commands: 
-  - It takes power to take downlink. Max battery XX Watt-hours. It takes 10 orbits to fully charge.
-  - Recharge Mode
-  - Normal Mode
-
-Comm Commands: 
-  - Downlink pics
-  - Downlink speed artificially limits to XX/2 per pass (i.e. It takes 2 passes to drain the storage entirely)
-  - Downlink telemetry (live or historical)
-
-Schedule:
-  - Schedule a command (time, command)
-  - Cancel a scheduled command
+    -- Minimum window duration is enforced
+    -- Overlapping window are not allowed
 
 
 ## Other notes

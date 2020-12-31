@@ -1,6 +1,7 @@
 FROM python:3.6
 
 ENV TERM xterm-256color
+ENV FLASK_APP=sat.py
 
 WORKDIR /app
 
@@ -10,4 +11,5 @@ COPY . /app
 
 RUN wget "https://www.celestrak.com/NORAD/elements/starlink.txt"
 
-CMD bash
+ENTRYPOINT ["python3"]
+CMD ["sat.py"]

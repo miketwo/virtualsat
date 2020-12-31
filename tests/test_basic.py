@@ -16,10 +16,13 @@ class BasicTestSuite(unittest.TestCase):
         look = sat.get_look(lat,lon+180)
         self.assertFalse(sat.is_visible_from(lat,lon+180))
         
-        sat.add_command("recharge", datetime.now() + timedelta(seconds=5))
-        sat.add_command("normal", datetime.now() + timedelta(seconds=10))
-        sat.add_command_scheduled_pics(datetime.now() + timedelta(seconds=11), 15)
-        sat.add_command("recharge", datetime.now() + timedelta(seconds=11+15))
+        now = datetime.now()
+        sat.add_command("recharge", now + timedelta(seconds=5))
+        sat.add_command("normal", now + timedelta(seconds=10))
+        sat.add_command_scheduled_pics(now + timedelta(seconds=11), 15)
+        sat.add_command("recharge", now + timedelta(seconds=11+15))
+        sat.add_command("normal", now + timedelta(seconds=11+15+20))
+        sat.add_command("downlink", now + timedelta(seconds=11+15+20+10))
 
         sat.print_commands()
 
