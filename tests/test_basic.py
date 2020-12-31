@@ -10,23 +10,23 @@ class BasicTestSuite(unittest.TestCase):
     def test_everything(self):
         sat = satellite.core.create_random_sat()
         lat, lon, _ = sat.current_position()
-        look = sat.get_look(lat,lon)
-
         self.assertTrue(sat.is_visible_from(lat,lon))
+
         look = sat.get_look(lat,lon+180)
         self.assertFalse(sat.is_visible_from(lat,lon+180))
         
         now = datetime.now()
-        sat.add_command("recharge", now + timedelta(seconds=5))
-        sat.add_command("normal", now + timedelta(seconds=10))
-        sat.add_command_scheduled_pics(now + timedelta(seconds=11), 15)
-        sat.add_command("recharge", now + timedelta(seconds=11+15))
-        sat.add_command("normal", now + timedelta(seconds=11+15+20))
-        sat.add_command("downlink", now + timedelta(seconds=11+15+20+10))
+        sat.schedule_command("power", {"mode": "recharge"}, now + timedelta(seconds=5))
+        sat.schedule_command("power", {"mode": "normal"}, now + timedelta(seconds=10))
+        sat.schedule_command_scheduled_pics(now + timedelta(seconds=11), 15)
+        sat.schedule_command("power", {"mode": "recharge"}, now + timedelta(seconds=11+15))
+        sat.schedule_command("power", {"mode": "normal"}, now + timedelta(seconds=11+15+20))
+        sat.schedule_command("image", "downlink", now + timedelta(seconds=11+15+20+10))
 
         sat.print_commands()
 
-        time.sleep(90)
+        # time.sleep(90)
+
 
 
 

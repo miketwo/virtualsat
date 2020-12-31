@@ -14,7 +14,6 @@ def main():
 @app.route('/', methods=["GET", "POST"])
 def index():
     if request.method == 'GET':
-        print("GET GET GET ")
         return gs.status()
     if request.method == 'POST':
         gs.send_command(request.form)

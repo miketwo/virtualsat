@@ -14,6 +14,17 @@ class ImagingSubsystem(object):
     def pictures(self):
         return [x for x in self._pictures if x is not None]
 
+    def exec(self, command):
+        '''
+        Expecting something like:
+            {"pic":"CREATE"}
+        '''
+        if "pic" in command.keys() and command["pic"] == "CREATE":
+            self.take_pic()
+        else:
+            print("Unable to execute command {}".format(command))
+
+
     def pop(self):
         for idx, pic in enumerate(self._pictures):
             if pic is not None:

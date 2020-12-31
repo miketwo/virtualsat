@@ -11,7 +11,7 @@ class PowerSubsystem(object):
     }
 
     def __init__(self):
-        super(PowerSubsystem, self).__init__()
+        super().__init__()
         print("Initilizing Power Subsystem")
         self.scheduler = BackgroundScheduler()
         self.scheduler.start()
@@ -31,6 +31,18 @@ class PowerSubsystem(object):
     def power_mode(self):
         return self._power_mode
 
+    def exec(self, command):
+        '''
+        Expecting something like:
+            {"mode":"recharge|normal"}
+        '''
+        print("rcvd {}".format(command))
+        if "mode" in command.keys():
+            return self.set_power_mode(command["mode"])
+        else:
+            print("Unable to execute command {}".format(command))
+            return False
+
     def get_tlm(self):
         return {
             "mode": self._power_mode,
@@ -43,14 +55,15 @@ class PowerSubsystem(object):
             print("Error: Mode {} not supported.".format(mode))
             return False
         self._power_mode = mode
+        return True
 
     def take_action(self, action):
         self._power -= self.ACTIVITY_POWER_DRAIN[action]
 
     def update(self):
-        if self._power_mode is "recharge" and self._power < self.MAX_POWER:
+        if self._power_mode == "recharge" and self._power < self.MAX_POWER:
             self._power += self.CHARGE_RATE
-        elif self._power_mode is "normal" and self._power > 0:
+        elif self._power_mode == "normal" and self._power > 0:
             self._power -= self.DRAIN_RATE
         else:
             None

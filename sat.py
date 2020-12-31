@@ -15,6 +15,15 @@ def index():
     if request.method == 'GET':
         return sat.status()
 
+@app.route('/radio', methods=["POST"])
+def radio():
+    if request.method == 'POST':
+        res = sat.radio.deserialize(request.get_json())
+        if res:
+            return "Success!"
+        else:
+            return "Bad request", 400
+
 #deprecated
 # def cli_interface():
 #     kb = kbhit.KBHit()

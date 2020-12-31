@@ -1,26 +1,22 @@
 # -*- coding: utf-8 -*-
-import sched
-import random
-import time
-import json
-from datetime import datetime, timedelta
-from functools import partial, partialmethod
+from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from pyorbital.orbital import Orbital
 import requests
+import base64
 
-'''
-Simple groundstation:
- - It has a location (lat/long)
-(Future)
- - It has a tracking antenna that can track orbital objects
- - It can be enabled/disabled for maintanence
-   - The need for maintanence builds over time
- - It generates telemetry
-'''
 class Groundstation():
+    '''
+    Simple groundstation:
+     - It has a location (lat/long)
+     - It has a tracking antenna that can track orbital objects
+    (Future)
+     - It can be enabled/disabled for maintanence
+       - The need for maintanence builds over time
+     - It generates telemetry
+    '''
     def __init__(self, name, lat, lon):
-        super(Groundstation, self).__init__()
+        super().__init__()
         print("Creating Groundstation")
         self.name = name
         self.location = (lat, lon)
@@ -29,9 +25,10 @@ class Groundstation():
         self._target = None
         self._scheduler = BackgroundScheduler()
         self._scheduler.start()
+        self._enabled = True
         self._scheduler.add_job(self.status, 'interval', seconds=5)
         self._scheduler.add_job(self.update, 'interval', seconds=1)
-        self.sat_url = "localhost:5000/sat"
+        self.sat_url = "http://0.0.0.0:5001/radio"
 
     def __str__(self):
         return str(self.status())
@@ -43,14 +40,25 @@ class Groundstation():
     def set_target(self, name, line1, line2):
         self._target = Orbital(name, line1=line1, line2=line2)
 
+    def set_enabled(self, enabled_bool):
+        self._enabled = enabled_bool
+
     def status(self):
         status = {
             "name": self.name,
             "time": datetime.utcnow().timestamp(),
+            "enabled": self._enabled,
             **self.get_pos(),
             **self.get_pointing(),
         }
         print(status)
+
+        cmd = {
+            "subsystem": "power",
+            "mode": "recharge"
+        }
+        self.send_command(cmd)
+
         return status
 
     def update(self):
@@ -75,8 +83,8 @@ class Groundstation():
         }
 
     def send_command(self, command):
-        data = {}.update(command, self.get_pos())
+        data = {**command, **self.get_pos()}
+        # payload = {"radio": base64.b64encode(data) }
         res = requests.post(self.sat_url, data=data)
         print(res)
-
 

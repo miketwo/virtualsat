@@ -23,6 +23,28 @@ Run `launchsat.sh`. Command the satellite with 1-letter commands:
  - 'l' for list pics
  - 'd' for download pic
 
+### Commands
+
+
+#### Satellite
+- Power
+ - "p r" - power recharge
+ - "p n" - power normal
+- Images
+ - "i SEC" - take images for SEC seconds.
+ - "i d #" - downlink image #
+- Telemetry
+ - "t d" - download all telemetry
+- Scheduling
+ - "s START_TIME CMD"
+
+#### Groundstation
+- Tracking
+ - "t ????" -- track sat (TBD)
+- Maintanence
+ - "e 0|1" -- enable GS | Maintainance mode
+- Commanding
+ - "f CMD" -- forward CMD to sat
 
 ToDo:
  - API interface
