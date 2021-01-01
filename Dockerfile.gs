@@ -9,7 +9,6 @@ COPY requirements.txt /app
 RUN pip install -r requirements.txt
 COPY . /app
 
-RUN wget "https://www.celestrak.com/NORAD/elements/starlink.txt"
+EXPOSE 5001
 
-ENTRYPOINT ["python3"]
-CMD ["gs.py"]
+CMD ["python3", "gs.py"]

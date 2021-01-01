@@ -1,52 +1,69 @@
 # Virtual Satellite
 
-- Launch the satellite and go to localhost:PORT/debug to see the satellite status and TLEs
+
+
+
+- Launch the satellite and go to localhost:5001/ to see the satellite status
+- Launch the groundstation and go to localhost:5000/ to see the status
+- Launch the console and use it to command both
 
 Level 1: Flatsat
 - Play with the satellite using the commands and buttons on debug. (Or MT interactive mode). Notice how power charges/discharges. Notice how pictures can be taken. Notice how if you run out of power, you lose all pictures. Notice how telemetry is created. Downlink as many pictures as you can.
 
 Level 2: Orbit
-- Now you need to schedule all your commands, using MT. Add the satellite to MT
+- Now you need to schedule all your commands using MT. Add the satellite to MT
 - Add a Groundstation (need to dockerize this as well)
 - Add a Gateway (?)
-- Schedule commands and downlink as many pictures as you can. 
+- Schedule commands and downlink as many pictures as you can.
 
 Level 3: Tbd... (more realism? manage thermal + other subsystems)
 
 
+## Quickstart
 
-## Quicktart
-Run `launchsat.sh`. Command the satellite with 1-letter commands:
- - 'r' to recharge
- - 'n' for normal mode
- - 'p' for pics
- - 'l' for list pics
- - 'd' for download pic
+In 3 terminal windows, run the following:
+ - `launchsat.sh` to build and deploy a virtual satellite in a docker container
+ - `launchground.sh` to build and deploy a virtual groundstation in a docker container
+ - `launchconsole.sh` to build and deploy an interactive console
+
+Commands in the console can be sent to either the satellite or groundstation.:
 
 ### Commands
 
+|Basic   |                   |
+|--------|-------------------|
+|ping gs |ping the groundstation|
+|ping sat|ping the satellite  |
 
 #### Satellite
-- Power
- - "power r" - power mode recharge
- - "power n" - power mode normal
-- Images
- - "image t" - take image
- - "image d" - downlink image
- - "image c" - clear images
-- Telemetry
- - "tlm d" - show current telemetry
- - "tlm h" - download all tlm history
+
+|Power  |                   |
+|-------|-------------------|
+|power r|power mode recharge|
+|power n|power mode normal  |
+
+|Images |                   |
+|-------|-------------------|
+|image t| take image        |
+|image d| downlink image    |
+|image c| clear images      |
+
+|Telemetry |                       |
+|-------|--------------------------|
+|tlm d  | show current telemetry   |
+|tlm h  | download all tlm history |
+
 - Scheduling
  - "s START_TIME CMD" - schedule any other command at START TIME (unix time seconds)
  - "image window START_TIME SEC" - schedules and imaging window for SEC seconds.
- 
+
 
 #### Groundstation
 - Tracking
  - "t ????" -- track sat (TBD)
 - Maintanence
- - "e 0|1" -- enable GS | Maintainance mode
+ - "enable gs"
+ - "disable gs" - For maintanence
 - Commanding
  - "f CMD" -- forward CMD to sat
 
@@ -59,10 +76,10 @@ ToDo:
 
 ## Design Principles
 
-### STAY SIMPLE: 
+### STAY SIMPLE:
  - Operator must balance Imaging, Downlinking, and Recharging.
- 
- - We must correctly simulate communication over a groundstation. The groundstation's lat/long can be included with each API call. That is used to determine if comms is possible. 
+
+ - We must correctly simulate communication over a groundstation. The groundstation's lat/long can be included with each API call. That is used to determine if comms is possible.
 
  - We must communicate with the satellite over a json API, not programmatically. The satellite code should be a black box.
 
@@ -93,7 +110,7 @@ The satellite keeps track of the following state:
  - Power is gained/reduced every XX seconds
    - It costs extra power to take pics
    - It costs extra power to downlink pics
-   - Reaching 0 power causes a reboot. Sat automatically switches to "recharge mode" 
+   - Reaching 0 power causes a reboot. Sat automatically switches to "recharge mode"
  - It takes XX orbits to recharge fully.
 
 ### Communication Subsystem

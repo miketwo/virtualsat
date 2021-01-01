@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import collections
-from ratelimit import limits, RateLimitException
 from pydispatch import dispatcher
 from functools import partial
 
@@ -12,14 +11,15 @@ def debug_listener(sender, **kwargs):
             "{} => {}".format(key, value) for key, value in kwargs.items()
         ]))
     )
-quickconnect = partial(dispatcher.connect, 
+quickconnect = partial(
+    dispatcher.connect,
     signal="GLOBAL",
     sender=dispatcher.Any)
 quickconnect(debug_listener)
 
 
 class ImagingSubsystem(object):
-    MAX_PICS = 5
+    MAX_PICS = 10
 
     def __init__(self, power_subsystem):
         super().__init__()
@@ -28,6 +28,7 @@ class ImagingSubsystem(object):
         self._pictures = collections.deque(maxlen=self.MAX_PICS)
         self._pic_counter = 1
         self._download_counter = 0
+        self._lost_counter = 0
         quickconnect(self.handle_signals)
 
     @property
@@ -36,7 +37,7 @@ class ImagingSubsystem(object):
 
     def handle_signals(self, msg):
         if "reboot" in msg:
-            self.clear()
+            self.reboot_clear()
 
     def exec(self, command):
         '''
@@ -46,16 +47,12 @@ class ImagingSubsystem(object):
             {"image":"clear"}
         '''
         cmdlist = {
-                "take": self.rate_limited_take_pic,
+                "take": self.take_pic,
                 "download": self.download,
                 "clear": self.clear
         }
         if "image" in command.keys():
-            try:
-                cmdlist[command["image"]]()
-            except RateLimitException as e:
-                errmsg = "You must wait 5 seconds between taking pictures"
-                raise SystemError(errmsg) from e
+            cmdlist[command["image"]]()
         else:
             errmsg = "Unable to execute command {}".format(command)
             raise ValueError(errmsg)
@@ -63,6 +60,10 @@ class ImagingSubsystem(object):
 
     def clear(self):
         self._pictures.clear()
+
+    def reboot_clear(self):
+        self._lost_counter += len(self._pictures)
+        self.clear()
 
     def download(self):
         if self.pwr.mode != "normal":
@@ -73,12 +74,8 @@ class ImagingSubsystem(object):
             self._pictures.pop()
             self._download_counter += 1
         except IndexError:
-            # Ignore download commands on empty lists
-            pass
-
-    @limits(calls=1, period=5)
-    def rate_limited_take_pic(self):
-        return self.take_pic()
+            errmsg = "ERROR: No pictures to download"
+            raise SystemError(errmsg)
 
     def take_pic(self):
         if self.pwr.mode != "normal":
@@ -89,10 +86,11 @@ class ImagingSubsystem(object):
         self._pictures.append(picname)
         self._pic_counter += 1
         return self.get_tlm()
-    
+
     def get_tlm(self):
         return {
             "num_pictures": len(self.pictures),
             "pictures": self.pictures,
-            "num_downloaded": self._download_counter
+            "num_downloaded": self._download_counter,
+            "num_lost": self._lost_counter
         }

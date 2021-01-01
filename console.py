@@ -3,30 +3,31 @@
 from cmd import Cmd
 import requests
 
-url = "http://sat:5001/radio"
+sat_url = "http://sat:5001/"
+
 
 class MyPrompt(Cmd):
-    prompt = 'Satellite/GS> '
+    prompt = 'Satellite> '
     intro = "Welcome! Type ? to list commands"
- 
+
     def do_exit(self, inp):
         print("Bye")
         return True
-    
+
     def help_exit(self):
         print('Exit the application. Shorthand: x q Ctrl-D.')
- 
+
     def do_power(self, arg):
         cmd = {"subsystem": "power"}
         if arg == 'r':
-            print("recharge mode")
+            print("Asking for recharge mode...")
             cmd.update({ "mode": "recharge"})
-            res = requests.post(url, json=cmd)
+            res = requests.post(sat_url, json=cmd)
             print(res)
         elif arg == 'n':
-            print("normal mode")
+            print("Asking for normal mode...")
             cmd.update({ "mode": "normal"})
-            res = requests.post(url, json=cmd)
+            res = requests.post(sat_url, json=cmd)
             print(res)
         else:
             self.help_power()
@@ -47,8 +48,7 @@ class MyPrompt(Cmd):
         if arg not in actions:
             return self.help_image()
         cmd = actions[arg]
-        print(cmd)
-        res = requests.post(url, json=cmd)
+        res = requests.post(sat_url, json=cmd)
         print(res.text)
 
     def help_image(self):
@@ -57,17 +57,22 @@ class MyPrompt(Cmd):
             image d - download image
             image c - clear images''')
 
-    def do_tlm(self, arg):
-        print("tbd")
- 
+    def do_ping(self, inp):
+        print("Tbd.... ping sat")
+
+    def help_ping(self):
+        print('''Simple Ping
+            ping - ping the satellite''')
+
+    def emptyline(self):
+        print(requests.get(sat_url + "/tlm").json())
+
     def default(self, inp):
         if inp == 'x' or inp == 'q':
             return self.do_exit(inp)
- 
-        print("Default: {}".format(inp))
- 
-    do_EOF = do_exit
-    help_EOF = help_exit
- 
+
+        print("No command found for '{}'".format(inp))
+
+
 if __name__ == '__main__':
     MyPrompt().cmdloop()  # blocking

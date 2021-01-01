@@ -1,0 +1,117 @@
+{
+  "system": "Starlink-24",
+  "definitions": {
+    "ping": {
+      "tags": [
+        "testing",
+        "operations"
+      ],
+      "fields": [
+
+      ],
+      "description": "Ping",
+      "display_name": "Ping"
+    },
+    "error": {
+      "tags": [
+        "testing"
+      ],
+      "fields": [
+
+      ],
+      "description": "Always errors to show the error process.",
+      "display_name": "Error Command"
+    },
+    "connect": {
+      "tags": [
+        "operations"
+      ],
+      "fields": [
+
+      ],
+      "description": "Points antennas and starts broadcasting carrier signal to establish RF lock with the spacecraft.",
+      "display_name": "Establish RF Lock"
+    },
+    "safemode": {
+      "tags": [
+        "operations",
+        "testing"
+      ],
+      "fields": [
+
+      ],
+      "description": "Commands the spacecraft into safemode, shutting down all non-essential systems.",
+      "display_name": "Safemode Command"
+    },
+    "telemetry": {
+      "tags": [
+        "operations",
+        "testing"
+      ],
+      "fields": [
+        {
+          "name": "mode",
+          "type": "string",
+          "range": [
+            "NOMINAL",
+            "ERROR"
+          ]
+        },
+        {
+          "name": "duration",
+          "type": "integer",
+          "default": 300
+        }
+      ],
+      "description": "Commands the spacecraft to beacon Health and Status Telemetry",
+      "display_name": "Start Telemetry Beacon"
+    },
+    "uplink_file": {
+      "tags": [
+        "files"
+      ],
+      "fields": [
+        {
+          "name": "gateway_download_path",
+          "type": "string"
+        }
+      ],
+      "description": "Uplink a staged file to the spacecraft.",
+      "display_name": "Uplink File"
+    },
+    "downlink_file": {
+      "tags": [
+        "files"
+      ],
+      "fields": [
+        {
+          "name": "filename",
+          "type": "string"
+        }
+      ],
+      "description": "Downlink an image from the Spacecraft.",
+      "display_name": "Downlink File"
+    },
+    "spacecraft_error": {
+      "tags": [
+        "testing"
+      ],
+      "fields": [
+
+      ],
+      "description": "Causes a critical error on the Spacecraft.",
+      "display_name": "Critical Event Command"
+    },
+    "update_file_list": {
+      "tags": [
+        "files",
+        "operations"
+      ],
+      "fields": [
+
+      ],
+      "description": "Downlinks the latest file list from the spacecraft.",
+      "display_name": "Update File List"
+    }
+  }
+}

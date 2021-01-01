@@ -28,7 +28,7 @@ class Groundstation():
         self._enabled = True
         self._scheduler.add_job(self.status, 'interval', seconds=5)
         self._scheduler.add_job(self.update, 'interval', seconds=1)
-        self.sat_url = "http://0.0.0.0:5001/radio"
+        self.sat_url = "http://sat:5001/"
 
     def __str__(self):
         return str(self.status())
@@ -36,7 +36,7 @@ class Groundstation():
     @property
     def target(self):
         return self._target
-    
+
     def set_target(self, name, line1, line2):
         self._target = Orbital(name, line1=line1, line2=line2)
 
@@ -52,12 +52,6 @@ class Groundstation():
             **self.get_pointing(),
         }
         print(status)
-
-        cmd = {
-            "subsystem": "power",
-            "mode": "recharge"
-        }
-        self.send_command(cmd)
 
         return status
 
@@ -84,7 +78,6 @@ class Groundstation():
 
     def send_command(self, command):
         data = {**command, **self.get_pos()}
-        # payload = {"radio": base64.b64encode(data) }
-        res = requests.post(self.sat_url, data=data)
+        res = requests.post(self.sat_url, json=data)
         print(res)
 

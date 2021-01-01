@@ -17,7 +17,7 @@ def imgsub(static_power_subsystem):
 
 @pytest.fixture
 def imgsub_low_power(lower_power_subsystem):
-    return images.ImagingSubsystem(power_subsystem=lower_power_subsystem)    
+    return images.ImagingSubsystem(power_subsystem=lower_power_subsystem)
 
 class TestTelemetry():
     def test_tlm_contains_everything(self, imgsub):
@@ -30,14 +30,6 @@ class TestLimitations():
         with pytest.raises(SystemError, match=r'(?i).*mode.*'):
             imgsub.download()
 
-    def test_no_downloads_in_low_power_mode(self, imgsub_low_power):
-        with pytest.raises(SystemError, match=r'(?i).*not enough power.*'):
-            imgsub_low_power.download()
-
-    def test_no_pics_in_low_power_mode(self, imgsub_low_power):
-        with pytest.raises(SystemError, match=r'(?i).*not enough power.*'):
-            imgsub_low_power.take_pic()
-
     def test_no_pics_in_recharging_mode(self, imgsub):
         imgsub.pwr.mode = "recharge"
         with pytest.raises(SystemError, match=r'(?i).*mode.*'):
@@ -45,10 +37,6 @@ class TestLimitations():
 
 
 class TestExecutingCommands():
-    def test_time_limit_between_images(self, imgsub):
+    def test_create_and_download_image(self, imgsub):
         imgsub.exec({"image": "take"})
-        with pytest.raises(SystemError, match=r'(?i).*must wait.*'):
-            imgsub.exec({"image": "take"})
-
-    def test_download_image(self, imgsub):
         res = imgsub.exec({"image": "download"})

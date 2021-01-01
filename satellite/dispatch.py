@@ -18,13 +18,13 @@ class DispatchSubsystem(object):
         if subsystem.exec is None:
             raise NotImplementedError("You must implement exec method for processing commands")
         # self._SUBSYSTEMS[name] = subsystem
-        dispatcher.connect(subsystem.exec, signal=name, sender=dispatcher.Any)
+        return dispatcher.connect(subsystem.exec, signal=name, sender=dispatcher.Any)
 
     def dispatch(self, subsystem, command):
         # if subsystem in self._SUBSYSTEMS:
-        #     return self._SUBSYSTEMS[subsystem].exec(command) 
+        #     return self._SUBSYSTEMS[subsystem].exec(command)
         # else:
         #     errmsg = "ERROR: No subsystem registered to handle '{}'".format(subsystem)
         #     raise SystemError(errmsg)
-        dispatcher.send(signal=subsystem, sender=self, cmd="reboot")
+        return dispatcher.send(signal=subsystem, sender=self, command=command)
 

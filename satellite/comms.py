@@ -18,4 +18,6 @@ class CommunicationSubsystem(object):
         print("Got command: {}".format(data))
         if data is None:
         	return
-        return self.dispatcher.dispatch(data['subsystem'], data)
+
+        return self.dispatcher.dispatch(data['subsystem'], command=data)
+

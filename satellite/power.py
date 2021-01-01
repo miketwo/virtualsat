@@ -8,10 +8,10 @@ logger = logging.getLogger(__name__)
 class PowerSubsystem(object):
     MAX_POWER = 100
     MIN_POWER = 0
-    DRAIN_RATE = 1
+    DRAIN_RATE = 0
     CHARGE_RATE = 1
     ACTIVITY_POWER_DRAIN = {
-        "picture": 5,
+        "picture": 10,
         "download": 10
     }
 
@@ -27,7 +27,7 @@ class PowerSubsystem(object):
         dispatcher.connect(self.exec, signal="COMMANDS", sender=dispatcher.Any)
 
     def __str__(self):
-        return "Mode:{}\tPower:{}\tReboots:{}".format(self._mode, self._power, self._reboot_counter)
+        return "Power Subsystem"
 
     @property
     def power(self):
@@ -81,9 +81,10 @@ class PowerSubsystem(object):
     def take_action(self, action):
         if action not in self.ACTIVITY_POWER_DRAIN:
             raise SystemError("Action not supported")
-        if self.ACTIVITY_POWER_DRAIN[action] > self.power:
-            errmsg = "Not enough power to do: {}".format(action)
-            raise SystemError(errmsg)
+        # Try disabling this for now...
+        # if self.ACTIVITY_POWER_DRAIN[action] > self.power:
+        #     errmsg = "Not enough power to do: {}".format(action)
+        #     raise SystemError(errmsg)
         self.power -= self.ACTIVITY_POWER_DRAIN[action]
         return self.get_tlm()
 
@@ -103,4 +104,3 @@ class PowerSubsystem(object):
             dispatcher.send(signal="GLOBAL", sender=self, msg="reboot")
 
         return self.get_tlm()
-        

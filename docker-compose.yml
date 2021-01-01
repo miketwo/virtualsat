@@ -1,0 +1,20 @@
+services:
+  sat:
+    build: Dockerfile.sat
+    ports:
+      - "5001:5001"
+    links:
+      - gs
+      - console
+  gs:
+    build: Dockerfile.gs
+    ports:
+      - "5000:5000"
+    links:
+      - sat
+      - console
+  console:
+    build: Dockerfile.console
+    links:
+      - sat
+      - gs
