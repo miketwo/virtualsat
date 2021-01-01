@@ -7,7 +7,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 class SchedulerSubsystem(object):
     def __init__(self, dispatcher):
-        super(SchedulerSubsystem, self).__init__()
+        super().__init__()
         print("Initilizing Scheduler Subsystem")
         self._command_id = 1
         self._dispatcher = dispatcher

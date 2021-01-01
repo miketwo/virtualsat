@@ -18,7 +18,7 @@ def index():
 @app.route('/radio', methods=["POST"])
 def radio():
     if request.method == 'POST':
-        res = sat.radio.deserialize(request.get_json())
+        res = sat.radio.deserialize(request.json)
         if res:
             return "Success!"
         else:

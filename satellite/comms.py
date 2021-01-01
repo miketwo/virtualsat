@@ -16,4 +16,6 @@ class CommunicationSubsystem(object):
         # data = json.loads(some_json)
         data = aDict
         print("Got command: {}".format(data))
+        if data is None:
+        	return
         return self.dispatcher.dispatch(data['subsystem'], data)

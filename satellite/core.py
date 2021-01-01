@@ -17,6 +17,8 @@ from satellite.dispatch import DispatchSubsystem
 from satellite.schedule import SchedulerSubsystem
 from satellite.comms import CommunicationSubsystem
 
+from pydispatch import dispatcher
+
 def parse_tles(raw_data):
     """Parse all the TLEs in the given raw text data."""
     tles = []
@@ -72,10 +74,11 @@ class Satellite(object):
         print("Please wait...")
 
         self.orb = Orbital(name, line1=tle1, line2=tle2)
+        self._dispatcher = DispatchSubsystem()
+
         self.power_subsystem = PowerSubsystem()
         self.imaging_subsystem = ImagingSubsystem(self.power_subsystem)
 
-        self._dispatcher = DispatchSubsystem()
         self._dispatcher.register_subsystem("power", self.power_subsystem)
         self._dispatcher.register_subsystem("image", self.imaging_subsystem)
 

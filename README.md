@@ -28,15 +28,19 @@ Run `launchsat.sh`. Command the satellite with 1-letter commands:
 
 #### Satellite
 - Power
- - "p r" - power recharge
- - "p n" - power normal
+ - "power r" - power mode recharge
+ - "power n" - power mode normal
 - Images
- - "i SEC" - take images for SEC seconds.
- - "i d #" - downlink image #
+ - "image t" - take image
+ - "image d" - downlink image
+ - "image c" - clear images
 - Telemetry
- - "t d" - download all telemetry
+ - "tlm d" - show current telemetry
+ - "tlm h" - download all tlm history
 - Scheduling
- - "s START_TIME CMD"
+ - "s START_TIME CMD" - schedule any other command at START TIME (unix time seconds)
+ - "image window START_TIME SEC" - schedules and imaging window for SEC seconds.
+ 
 
 #### Groundstation
 - Tracking
