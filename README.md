@@ -8,13 +8,13 @@
 - Launch the console and use it to command both
 
 Level 1: Flatsat
-- Play with the satellite using the commands and buttons on debug. (Or MT interactive mode). Notice how power charges/discharges. Notice how pictures can be taken. Notice how if you run out of power, you lose all pictures. Notice how telemetry is created. Downlink as many pictures as you can.
+- Play with the satellite using the commands and buttons on debug. (Or MT interactive mode). Notice how power charges/discharges. Notice how value can be generated. Notice how if you run out of power, you lose all stored value. Notice how telemetry is created. Downlink as much value as you can.
 
 Level 2: Orbit
 - Now you need to schedule all your commands using MT. Add the satellite to MT
 - Add a Groundstation (need to dockerize this as well)
 - Add a Gateway (?)
-- Schedule commands and downlink as many pictures as you can.
+- Schedule commands and downlink as much value as you can.
 
 Level 3: Tbd... (more realism? manage thermal + other subsystems)
 
@@ -42,20 +42,20 @@ Commands in the console can be sent to either the satellite or groundstation.:
 |power r|power mode recharge|
 |power n|power mode normal  |
 
-|Images |                   |
+|Value |                   |
 |-------|-------------------|
-|image t| take image        |
-|image d| downlink image    |
-|image c| clear images      |
+|value t| create value        |
+|value d| downlink value    |
 
 |Telemetry |                       |
 |-------|--------------------------|
 |tlm d  | show current telemetry   |
 |tlm h  | download all tlm history |
 
-- Scheduling
- - "s START_TIME CMD" - schedule any other command at START TIME (unix time seconds)
- - "image window START_TIME SEC" - schedules and imaging window for SEC seconds.
+
+|Scheduling |                       |
+|-------|--------------------------|
+|s START_TIME CMD  | schedule any other command at START TIME (unix time seconds)   |
 
 
 #### Groundstation
@@ -77,7 +77,7 @@ ToDo:
 ## Design Principles
 
 ### STAY SIMPLE:
- - Operator must balance Imaging, Downlinking, and Recharging.
+ - Operator must balance Creating Value, Downlinking, and Recharging.
 
  - We must correctly simulate communication over a groundstation. The groundstation's lat/long can be included with each API call. That is used to determine if comms is possible.
 
@@ -94,7 +94,7 @@ ToDo:
 The satellite keeps track of the following state:
   - Onboard Storage, including
     - Telemetry history
-    - Picture history
+    - Value history
   - Power, including
     - "Mode" (recharging vs not)
     - Number of Reboots
@@ -108,15 +108,14 @@ The satellite keeps track of the following state:
 
 ### Power Subsystem
  - Power is gained/reduced every XX seconds
-   - It costs extra power to take pics
-   - It costs extra power to downlink pics
+   - It costs extra power to create value
+   - It costs extra power to download value
    - Reaching 0 power causes a reboot. Sat automatically switches to "recharge mode"
  - It takes XX orbits to recharge fully.
 
 ### Communication Subsystem
   - Upload commands (scheduled or immediate)
-  - Downlink pics
-    - Downlink speed artificially limited (it takes 2 passes to drain storage)
+  - Downlink value
   - Downlink telemetry
     - All TLM can be downloaded instantaneously
 
@@ -124,14 +123,11 @@ The satellite keeps track of the following state:
   - Schedule a command (time, command)
   - Cancel a scheduled command
 
-### Imaging Subsystem
-  - Take pictures (straight down at current lat/long -- populate from Google Earth?)
-  - Pics are taken on a commanded window
-    -- Start time + duration
-    -- It costs power to take pics
-    -- There is a maximum amount that can be stored. Asking for more produces errors.
-    -- Minimum window duration is enforced
-    -- Overlapping window are not allowed
+### Value Subsystem
+  - Creates value
+  - Value is created on demand
+    -- It costs power to create value
+    -- There is a maximum amount that can be stored. Asking for more drops old value.
 
 
 ## Other notes

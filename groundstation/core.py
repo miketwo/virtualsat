@@ -76,6 +76,7 @@ class Groundstation():
             "in pass": self._el > 0,
         }
 
+    ''' Passes a command through to the satellite '''
     def send_command(self, command):
         data = {**command, **self.get_pos()}
         res = requests.post(self.sat_url, json=data)

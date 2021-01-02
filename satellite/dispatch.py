@@ -8,17 +8,19 @@ class DispatchSubsystem(object):
     def __init__(self):
         super(DispatchSubsystem, self).__init__()
         logger.info("Initilizing Dispatch Subsystem")
-        self._SUBSYSTEMS = {}
+        self._SUBSYSTEMS = set()
 
     def get_tlm(self):
-        return {}
+        return {"dispatch": {
+            "registered subs": list(self._SUBSYSTEMS)
+        }}
 
     def register_subsystem(self, name, subsystem):
         # Make sure exec function exists
-        if subsystem.exec is None:
+        if subsystem is None:
             raise NotImplementedError("You must implement exec method for processing commands")
-        # self._SUBSYSTEMS[name] = subsystem
-        return dispatcher.connect(subsystem.exec, signal=name, sender=dispatcher.Any)
+        self._SUBSYSTEMS.add(name)
+        return dispatcher.connect(subsystem, signal=name, sender=dispatcher.Any)
 
     def dispatch(self, subsystem, command):
         # if subsystem in self._SUBSYSTEMS:

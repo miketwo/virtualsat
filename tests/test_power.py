@@ -49,7 +49,7 @@ class TestUpdatingState():
 class TestTakingActions:
 
     @pytest.mark.parametrize("action", [
-        ("picture"),
+        ("value"),
         ("download"),
     ])
     def test_actions_reduce_power(self, pwrsub, action):

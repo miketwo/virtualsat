@@ -11,7 +11,7 @@ class PowerSubsystem(object):
     DRAIN_RATE = 0
     CHARGE_RATE = 1
     ACTIVITY_POWER_DRAIN = {
-        "picture": 10,
+        "value": 10,
         "download": 10
     }
 

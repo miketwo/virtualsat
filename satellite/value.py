@@ -18,22 +18,22 @@ quickconnect = partial(
 quickconnect(debug_listener)
 
 
-class ImagingSubsystem(object):
-    MAX_PICS = 10
+class ValueSubsystem(object):
+    MAX_VALUE = 10
 
     def __init__(self, power_subsystem):
         super().__init__()
-        print("Initilizing Image Subsystem")
+        print("Initilizing Value Subsystem")
         self.pwr = power_subsystem
-        self._pictures = collections.deque(maxlen=self.MAX_PICS)
-        self._pic_counter = 1
+        self._value = collections.deque(maxlen=self.MAX_VALUE)
+        self._value_counter = 1
         self._download_counter = 0
         self._lost_counter = 0
         quickconnect(self.handle_signals)
 
     @property
-    def pictures(self):
-        return list(self._pictures)
+    def value(self):
+        return list(self._value)
 
     def handle_signals(self, msg):
         if "reboot" in msg:
@@ -42,55 +42,59 @@ class ImagingSubsystem(object):
     def exec(self, command):
         '''
         Expecting something like:
-            {"image":"take"}
-            {"image":"download"}
-            {"image":"clear"}
+            {"value":"create"}
+            {"value":"download"}
+            {"value":"clear"}
         '''
         cmdlist = {
-                "take": self.take_pic,
+                "create": self.create_value,
                 "download": self.download,
                 "clear": self.clear
         }
-        if "image" in command.keys():
-            cmdlist[command["image"]]()
+        if "value" in command.keys():
+            cmdlist[command["value"]]()
         else:
             errmsg = "Unable to execute command {}".format(command)
             raise ValueError(errmsg)
         return True
 
     def clear(self):
-        self._pictures.clear()
+        self._value.clear()
 
     def reboot_clear(self):
-        self._lost_counter += len(self._pictures)
+        self._lost_counter += len(self._value)
         self.clear()
 
     def download(self):
         if self.pwr.mode != "normal":
-            errmsg = "ERROR: Must be in normal power mode to download pictures"
+            errmsg = "ERROR: Must be in normal power mode to download value"
             raise SystemError(errmsg)
-        try:
-            self.pwr.take_action('picture')
-            self._pictures.pop()
-            self._download_counter += 1
-        except IndexError:
-            errmsg = "ERROR: No pictures to download"
+        if len(self._value) == 0:
+            errmsg = "ERROR: No value to download"
             raise SystemError(errmsg)
+        self.pwr.take_action('value')
+        self._value.pop()
+        self._download_counter += 1
 
-    def take_pic(self):
+    def create_value(self):
         if self.pwr.mode != "normal":
-            errmsg = "ERROR: Must be in normal power mode to take pictures"
+            errmsg = "ERROR: Must be in normal power mode to create value"
             raise SystemError(errmsg)
-        self.pwr.take_action('picture')
-        picname = "Pic{}".format(self._pic_counter)
-        self._pictures.append(picname)
-        self._pic_counter += 1
+        self.pwr.take_action('value')
+        name = "Value{}".format(self._value_counter)
+        if len(self._value) == self.MAX_VALUE:
+            print("Overwriting previous...")
+            self._lost_counter += 1
+        self._value.append(name)
+        self._value_counter += 1
         return self.get_tlm()
 
     def get_tlm(self):
         return {
-            "num_pictures": len(self.pictures),
-            "pictures": self.pictures,
-            "num_downloaded": self._download_counter,
-            "num_lost": self._lost_counter
+            "value": {
+                "num": len(self.value),
+                "names": self.value,
+                "num_downloaded": self._download_counter,
+                "num_lost": self._lost_counter
+            }
         }

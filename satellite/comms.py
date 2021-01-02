@@ -15,7 +15,7 @@ class CommunicationSubsystem(object):
         # cmd = base64.b64decode(aString)
         # data = json.loads(some_json)
         data = aDict
-        print("Got command: {}".format(data))
+        print("Got command for {}: {}".format(data['subsystem'], data))
         if data is None:
         	return
 

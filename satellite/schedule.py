@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from datetime import timedelta
+from datetime import datetime, timedelta
 from functools import partial, partialmethod
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -20,6 +20,26 @@ class SchedulerSubsystem(object):
             "num scheduled commands": len(self.get_commands()),
             "scheduled commands": self.get_commands()
         }
+
+    def exec(self, command):
+        '''
+        Expecting something like:
+            {"command": {
+                "subsystem": "power"
+                "mode": ""}
+             ""
+            }
+        '''
+        print("rcvd {}".format(command))
+        if "time" in command and "command" in command:
+            subsystem = command["command"]["subsystem"]
+            subsystem = command["command"]
+            target_datetime = datetime.utcfromtimestamp(int(float((command["time"]))))
+            self.schedule_command(subsystem, command, target_datetime)
+            return self.get_tlm()
+        else:
+            errmsg = "Unable to execute command {}".format(command)
+            raise ValueError(errmsg)
 
     def schedule_command(self, subsystem, command, target_datetime):
         tmp = str(self._command_id)
@@ -47,21 +67,3 @@ class SchedulerSubsystem(object):
         cmds = [j.name for j in self.command_scheduler.get_jobs()]
         for cmd in cmds:
             print("  {}".format(cmd))
-
-    def schedule_command_scheduled_pics(self, start_date, duration_sec):
-        tmp = str(self._command_id)
-        subsystem = "image"
-        command = {"pic": "CREATE"}
-        name = "CMD #{}: {} | Picture Window @ {} for {} seconds".format(tmp, subsystem, start_date, duration_sec)
-        func = partial(self._dispatcher.dispatch, subsystem, command)
-        self.command_scheduler.add_job(
-            func,
-            'interval', 
-            seconds=5, 
-            start_date=start_date, 
-            end_date=start_date+timedelta(seconds=duration_sec),
-            id=tmp,
-            name=name)
-        # print("Scheduled command {} at {} for {} seconds".format(tmp, start_date, duration_sec))
-        self._command_id += 1
-        return tmp

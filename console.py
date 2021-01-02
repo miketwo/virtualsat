@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from cmd import Cmd
 import requests
+import time
 
 sat_url = "http://sat:5001/"
 
@@ -37,25 +38,37 @@ class MyPrompt(Cmd):
             power r -- recharge
             power n -- normal''')
 
-    def do_image(self, arg):
-        cmd = {"subsystem": "image"}
+    def do_value(self, arg):
+        cmd = {"subsystem": "value"}
 
         actions = {
-            "t": {**cmd , "image": "take"},
-            "d": {**cmd,  "image": "download"},
-            "c": {**cmd,  "image": "clear"}
+            "c": {**cmd, "value": "create"},
+            "d": {**cmd,  "value": "download"},
         }
         if arg not in actions:
-            return self.help_image()
+            return self.help_value()
         cmd = actions[arg]
         res = requests.post(sat_url, json=cmd)
         print(res.text)
 
-    def help_image(self):
-        print('''Image subsystem:
-            image t - take image
-            image d - download image
-            image c - clear images''')
+    def help_value(self):
+        print('''value subsystem:
+            value c - create value
+            value d - download value''')
+
+    def do_sched(self, arg):
+        cmd = {
+            "subsystem": "sched",
+            "time": str(time.time() + 10),
+            "command": {
+                "subsystem": "power",
+                "mode": "recharge"
+            }
+        }
+        # if arg not in actions:
+            # return self.help_value()
+        res = requests.post(sat_url, json=cmd)
+        print(res.text)
 
     def do_ping(self, inp):
         print("Tbd.... ping sat")

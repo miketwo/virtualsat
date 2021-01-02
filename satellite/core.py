@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from satellite.comms import CommunicationSubsystem
 from satellite.dispatch import DispatchSubsystem
-from satellite.images import ImagingSubsystem
+from satellite.value import ValueSubsystem
 from satellite.orbit import Orbit
 from satellite.power import PowerSubsystem
 from satellite.schedule import SchedulerSubsystem
@@ -31,18 +31,19 @@ class Satellite(object):
         self._dispatcher = DispatchSubsystem()
 
         self.power_subsystem = PowerSubsystem()
-        self.imaging_subsystem = ImagingSubsystem(self.power_subsystem)
-
-        self._dispatcher.register_subsystem("power", self.power_subsystem)
-        self._dispatcher.register_subsystem("image", self.imaging_subsystem)
-
+        self.value_subsystem = ValueSubsystem(self.power_subsystem)
+        self._scheduler = SchedulerSubsystem(self._dispatcher)
         self.radio = CommunicationSubsystem(self._dispatcher)
 
-        self._scheduler = SchedulerSubsystem(self._dispatcher)
+
+        # Wire things up...
+        self._dispatcher.register_subsystem("power", self.power_subsystem.exec)
+        self._dispatcher.register_subsystem("value", self.value_subsystem.exec)
+        self._dispatcher.register_subsystem("sched", self._scheduler.exec)
 
         self.telemetry_subsystem = TelemetrySubsystem()
         self.telemetry_subsystem.register(self.power_subsystem.get_tlm)
-        self.telemetry_subsystem.register(self.imaging_subsystem.get_tlm)
+        self.telemetry_subsystem.register(self.value_subsystem.get_tlm)
         self.telemetry_subsystem.register(self._scheduler.get_tlm)
         self.telemetry_subsystem.register(self._dispatcher.get_tlm)
 
@@ -56,13 +57,4 @@ class Satellite(object):
 
     def status(self):
         return dict(self.telemetry_subsystem.get_tlm())
-
-    def schedule_command(self, *args, **kwargs):
-        self._scheduler.schedule_command(*args, **kwargs)
-
-    def schedule_command_scheduled_pics(self, *args, **kwargs):
-        self._scheduler.schedule_command_scheduled_pics(*args, **kwargs)
-
-    def print_commands(self, *args, **kwargs):
-        self._scheduler.print_commands(*args, **kwargs)
 

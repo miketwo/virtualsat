@@ -5,4 +5,4 @@ init:
 .PHONY: test
 test:
 	find . -name \*.pyc -delete
-	ptw -- -v -s --cache-clear
+	ptw --poll -- --verbose --capture=no --cache-clear
