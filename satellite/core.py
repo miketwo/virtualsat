@@ -8,7 +8,7 @@ from satellite.schedule import SchedulerSubsystem
 from satellite.telemetry import TelemetrySubsystem
 
 
-class Satellite(object):
+class Satellite():
 
     @classmethod
     def flatsat(cls):
@@ -20,21 +20,18 @@ class Satellite(object):
         self.tle1 = tle1
         self.tle2 = tle2
 
-        self.flatsat = tle1 is None or tle2 is None
+        self.flatsatmode = tle1 is None or tle2 is None
 
         print("Creating Satellite named {}".format(name))
-        print("Please wait...")
 
-        if not self.flatsat:
-            self.orbit = Orbit(name, line1=tle1, line2=tle2)
-
+        # Create all subsystems
         self._dispatcher = DispatchSubsystem()
-
         self.power_subsystem = PowerSubsystem()
         self.value_subsystem = ValueSubsystem(self.power_subsystem)
         self._scheduler = SchedulerSubsystem(self._dispatcher)
         self.radio = CommunicationSubsystem(self._dispatcher)
-
+        if not self.flatsatmode:
+            self.orbit = Orbit(name, line1=tle1, line2=tle2)
 
         # Wire things up...
         self._dispatcher.register_subsystem("power", self.power_subsystem.exec)
@@ -47,7 +44,7 @@ class Satellite(object):
         self.telemetry_subsystem.register(self._scheduler.get_tlm)
         self.telemetry_subsystem.register(self._dispatcher.get_tlm)
 
-        if not self.flatsat:
+        if not self.flatsatmode:
             self.telemetry_subsystem.register(self.orbit.get_tlm)
 
         print(self)

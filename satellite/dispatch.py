@@ -4,7 +4,7 @@ from pydispatch import dispatcher
 
 logger = logging.getLogger(__name__)
 
-class DispatchSubsystem(object):
+class DispatchSubsystem():
     def __init__(self):
         super(DispatchSubsystem, self).__init__()
         logger.info("Initilizing Dispatch Subsystem")

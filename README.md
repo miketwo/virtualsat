@@ -1,20 +1,23 @@
 # Virtual Satellite
 
-This is a virtual satellite that you can operate! 
+This is a virtual satellite that you can operate! It is an extremely simple satellite model, but it can be used to practice Misson Ops.
 
-It is an extremely simple satellite, but it can be used to practice Misson Ops.
+**The goal is to download as much Value as possible**.
 
-The goal is to download as much Value as possible.
+Value is created on the satellite via a command. Value can be downloaded with another command. Both of these actions cost Power. If you run out of power, the satellite reboots and all stored onboard Value is lost. 
 
-The satellite can create Value via a command. And it can download Value with another command. Both of these actions cost Power. 
+Power has 2 modes: Normal and Recharging. Normal power is used when creating and downloading Value. Recharging is used to recharge. Reboots will automatically put the satellite into Recharge Mode.
 
-Power has 2 modes: Normal and Recharging. Normal power is used when creating and downloading Value. Recharging is used to recharge. If you run out of power, the satellite reboots into a Recharge mode and all onboard Value is lost. 
-
-Lastly, there is a limited amount of onboard storage for both Value and telemetry. Once it is full, the oldest entries will be cleared to make room for newer ones.
+There is a limited amount of onboard storage. Once it is full, the oldest entries for Value or Telemetry will be cleared to make room for newer ones.
 
 ## Getting Started
 
 You'll want to experiment with the satellite with increasing levels of difficulty...
+
+First things first, create a docker network for everything we'll be doing. This will allow containers to talk to each other:
+```
+docker network create VirtualSatNet
+```
 
 ### Level 1: Flatsat
 
@@ -24,29 +27,30 @@ Start the satellite "on the ground" with the following command:
 docker run --rm -it \
   -p 5001:5001/tcp \
   --name sat \
+  --network VirtualSatNet \
   miketwo/virtualsat
 ```
 
-The interactive `-it` is not strictly necessary, but I find it easier to Ctrl-C when I want to quit than use `docker stop`. YMMV...
+*The interactive `-it` is not strictly necessary, but I find it easier to use Ctrl-C when I want to quit than `docker stop`. YMMV...*
 
 In another terminal, start the console with the following command:
 
 ```
 docker run --rm -it \
     --name console \
-    --link sat \
+    --network VirtualSatNet \
     miketwo/virtualsat-console
 ```
 
-This creates an interactive console with which to command the satellite.
+This creates an interactive console with which to command the satellite (and eventually groundstation).
 
 Play with the satellite using the commands shown. **You can press enter on a blank line to get telemetry**. Notice how power charges/discharges. Notice how Value can be generated. Notice how if you run out of power, you lose all stored value and the reboot counter increments. Notice how telemetry is created. 
 
-You can also visit http://localhost:5001/ to see current telemetry, and http://localhost:5001/history to see historical telemetry. Once you get a feel for how to optimally generate value, move on to the next level.
+You can visit http://localhost:5001/ to see current telemetry, and http://localhost:5001/history to see historical telemetry. Once you get a feel for how to optimally generate value, move on to the next level.
 
 ## Level 2: Orbit (under development)
 
-Here's where things get interesting. You're putting the satellite in orbit. 
+Here's where things get interesting.
 
 To launch the satellite, run the following command:
 
@@ -54,48 +58,67 @@ To launch the satellite, run the following command:
 docker run --rm -it \
   -p 5001:5001/tcp \
   --name sat \
+  --network VirtualSatNet \
   -e USE_ORBIT_PARAMETERS=TRUE \
   miketwo/virtualsat
 ```
 
-**TBD: Everything from here down is future work...**
+Now that the satellite is in orbit, **it will only respond to commands when it is over a groundstation**. You will need to deploy a groundstation. 
 
-Now that the satellite is in orbit, *it will only respond to commands when it is over a groundstation*. You will need to deploy a groundstation. 
-
-Hopefully that can eventually be done with something like:
+That can be done with the following:
 
 ```
 docker run --rm -it \
   -p 5000:5000/tcp \
   --name gs \
-  --link sat \
+  --network VirtualSatNet \
   miketwo/virtualsat-gs
 ```
 
-- Now you need to schedule all your commands. Using a Mission Control will make this MUCH easier.
+Now you need to schedule all your commands. **Using a Mission Control will make this MUCH easier**. But for now, a few commands will be available manually. If you haven't already, start the console:
+
+```
+docker run --rm -it \
+    --name console \
+    --network VirtualSatNet \
+    miketwo/virtualsat-console
+```
+
+ToDo: Readme instructions for
+- Manual tracking/commanding
 - Add the satellite/gs/gateays to MT
-- Schedule commands and downlink as much value as you can.
-- Monitor telemetry to see how you're doing.
+- Scheduling commands and downlinking value
+- Monitoring telemetry
 
 ## Level 3: Many satellites. Tbd... 
 
-Launch 100 satellites and 10 groundstations. Manage the fleet using awesome tools. Download the most value.
+Goal: Launch 100 satellite and 10 groundstations. Manage the fleet using awesome tools. Optimize operations for the most value.
 
 ## Bonus Level 4: More challenges... 
 
-Many ideas here... 
+Many ideas here. Easy to go overboard. I'd like to do the absolute smallest change necessary to demonstrate the best features of Mission Control.
+- Varying rates of charge/discharge between sats
+- Non-static state (constant draining)
+- Rate limits on generating/downloading value
+- New axis of consideration, like thermal or GS maintanence
+- Errors with mandatory diagnostic commanding. (Have to upload "diag1", "diag2", ... on different passes to get back to normal)
+- Phases of flight, such as checkout. (Demonstrate scriptability)
+- Performance optimizations (changing rates with "work")
+- Sats with constraints (such as "no eclipse passes" or reduced storage)
 
 
-## Quickstart
+# Console Reference
 
-In 3 terminal windows, run the following:
- - `launchsat.sh` to build and deploy a virtual satellite in a docker container
- - `launchground.sh` to build and deploy a virtual groundstation in a docker container
- - `launchconsole.sh` to build and deploy an interactive console
+The console can talk to either the satellite (in flatsat mode) or a groundstation. When you first start, you must select which system to talk to.
 
-Commands in the console can be sent to either the satellite or groundstation.:
+```
+Welcome! Are you talking to a satellite or groundstation?
+Console> 
+```
 
-### Command Reference
+The "commands" `satellite` or `groundstation` will take you to the respective console. Quiting those will bring you back to the main console.
+
+## Satellite Console 
 
 |Power  |                   |
 |-------|-------------------|
@@ -115,17 +138,26 @@ Commands in the console can be sent to either the satellite or groundstation.:
 |-------|--------------------------|
 |s START_TIME CMD  | schedule any other command at START TIME (unix time seconds)   |
 
+## Groundstation Console
 
-#### Groundstation
-- Tracking command
- - "t ????" -- track sat (TBD)
-- Maintanence mode?
- - "enable gs"
- - "disable gs" - For maintanence
-- Commanding
- - "f CMD" -- forward CMD to sat
+You can command the groundstation to track a satellite. The console will ask you for a satellite name and the Two-Line Elements (TLEs). If you have not modified your environment variables, the default satellite is:
+```
+STARLINK-24
+1 44238U 19029D   20366.78684316  .00004289  00000-0  24662-3 0  9998
+2 44238  52.9975  32.3246 0001305  89.7284 270.3857 15.14479195 87325
+```
+The TLEs must be copied exactly as shown.
 
-Many ToDo's:
+|Tracking |                       |
+|-------|--------------------------|
+|track  | input tracking information for the groundstation  |
+
+|Forward cmd (TBD) |                       |
+|-------|--------------------------|
+|f (any sat cmd) | immediately forward a command to the satellite  |
+
+
+## ToDo's:
  - Finish Levels 2 and 3
  - Logging instead of prints
  - General code cleanup

@@ -15,10 +15,10 @@ class Orbit(Orbital):
         }}
 
     def current_position(self):
-        return self.get_lonlatalt(datetime.now())
+        return self.get_lonlatalt(datetime.utcnow())
 
     def get_look(self, lat, lon):
-        self.get_observer_look(datetime.now(), lat, lon, 0)
+        return self.get_observer_look(datetime.utcnow(), lat, lon, 0)
 
     def is_visible_from(self, lat,lon):
         az, el = self.get_look(lat, lon)

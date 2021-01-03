@@ -1,8 +1,9 @@
 #!/bin/bash
 
 docker build -t console -f Dockerfile.console .
+docker network create VirtualSatNet
 docker run --rm -it \
     -v $(pwd):/app  \
     --name console \
-    --link sat \
+    --network VirtualSatNet \
     console

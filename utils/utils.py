@@ -3,6 +3,7 @@
 import logging
 import os
 from satellite.core import Satellite
+from groundstation.core import Groundstation
 from pyorbital import tlefile
 
 
@@ -22,6 +23,16 @@ def create_sat_from_env():
         return Satellite(satname, tle1, tle2)
     else:
         return Satellite.flatsat()
+
+def create_gs_from_env():
+    for envar in ["GS_NAME", "GS_LATITUDE", "GS_LONGITUDE"]:
+        if os.getenv(envar) is None:
+            raise NameError("{} must be specified as an environment variable.".format(envar))
+
+        name = os.getenv('GS_NAME')
+        lat = os.getenv('GS_LATITUDE')
+        lon = os.getenv('GS_LONGITUDE')
+        return Groundstation(name, lat, lon)
 
 
 def create_random_sat():

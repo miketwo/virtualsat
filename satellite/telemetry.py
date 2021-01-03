@@ -2,9 +2,10 @@
 from datetime import datetime
 import collections
 from apscheduler.schedulers.background import BackgroundScheduler
+import logging
+logger = logging.getLogger(__name__)
 
-
-class TelemetrySubsystem(object):
+class TelemetrySubsystem():
     TLM_MAX_HISTORY = 10
     RECORD_FREQ_SEC = 1
 
@@ -31,7 +32,7 @@ class TelemetrySubsystem(object):
         Respond to any command with current telemetry
         '''
         logger.debug("rcvd {}".format(command))
-        return get_tlm()
+        return self.get_tlm()
 
     def __str__(self):
         return str(self.get_tlm())

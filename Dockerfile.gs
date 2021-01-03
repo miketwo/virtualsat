@@ -11,4 +11,8 @@ COPY . /app
 
 EXPOSE 5001
 
+ENV GS_NAME="STL GroundStation"
+ENV GS_LATITUDE=38.6270
+ENV GS_LONGITUDE=-90.1994
+
 CMD ["python3", "gs.py"]

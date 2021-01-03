@@ -5,7 +5,7 @@ from pydispatch import dispatcher
 import logging
 logger = logging.getLogger(__name__)
 
-class PowerSubsystem(object):
+class PowerSubsystem():
     MAX_POWER = 100
     MIN_POWER = 0
     DRAIN_RATE = 0

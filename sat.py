@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import os
 from utils import utils
 from flask import Flask, request
 
@@ -7,6 +8,7 @@ app = Flask(__name__)
 sat = utils.create_sat_from_env()
 HOST = '0.0.0.0'
 PORT = 5001
+IN_ORBIT = bool(os.getenv("USE_ORBIT_PARAMETERS", "FALSE") == "TRUE")
 
 
 def main():
@@ -25,13 +27,13 @@ def main():
 
 @app.route('/', methods=["GET", "POST"])
 def index():
-    if request.method == 'GET':
+    if request.method == 'GET' and not IN_ORBIT:
         tlm = sat.status()
         tlm["_links"] = {
             "telemetry history": "http://localhost:{}/history".format(PORT)
         }
         return tlm
-    if request.method == 'POST':
+    if request.method == 'POST' and not IN_ORBIT:
         try:
             res = sat.radio.deserialize(request.json)
             if res:
@@ -40,15 +42,20 @@ def index():
                 return "Bad request", 400
         except SystemError as e:
             return str(e), 400
+    return ({}, 204)
+
+@app.route('/radio', methods=["GET", "POST"])
+def radio():
+    return "tbd radio comms to/from gs"
 
 
-@app.route('/tlm', methods=["GET"])
-def tlm():
+@app.route('/debug', methods=["GET"])
+def debug():
     return sat.status()
 
 @app.route('/history', methods=["GET"])
 def history():
-    if request.method == 'GET':
+    if request.method == 'GET' and not IN_ORBIT:
         history_array = sat.telemetry_subsystem.get_history()
         tlm = {
             "history": history_array,
@@ -57,6 +64,7 @@ def history():
             }
         }
         return tlm
+    return ({}, 204)
 
 
 if __name__ == '__main__':

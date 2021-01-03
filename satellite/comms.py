@@ -2,7 +2,8 @@
 import base64
 import json
 
-class CommunicationSubsystem(object):
+
+class CommunicationSubsystem():
     ''' Fake radio communication '''
     def __init__(self, dispatcher):
         super().__init__()

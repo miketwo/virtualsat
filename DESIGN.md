@@ -54,3 +54,16 @@ The satellite keeps track of the following state:
   - Value is created on demand
     -- It costs power to create value
     -- There is a maximum amount that can be stored. Asking for more drops old value.
+    -- It should cost more to generate than download, to mimic the reality that generation is usually spread out over an orbit.
+
+
+#### Groundstation
+- Tracking command
+ - "t ????" -- track sat (TBD)
+- Maintanence mode?
+ - "enable gs"
+ - "disable gs" - For maintanence
+- Commanding
+ - "f CMD" -- forward CMD to sat
+- Scheduling on the GS?
+ - Re-use sat model?

@@ -18,7 +18,7 @@ quickconnect = partial(
 quickconnect(debug_listener)
 
 
-class ValueSubsystem(object):
+class ValueSubsystem():
     MAX_VALUE = 10
 
     def __init__(self, power_subsystem):

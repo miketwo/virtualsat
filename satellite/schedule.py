@@ -5,7 +5,7 @@ from functools import partial, partialmethod
 from apscheduler.schedulers.background import BackgroundScheduler
 
 
-class SchedulerSubsystem(object):
+class SchedulerSubsystem():
     def __init__(self, dispatcher):
         super().__init__()
         print("Initilizing Scheduler Subsystem")
