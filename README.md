@@ -42,11 +42,13 @@ docker run --rm -it \
     miketwo/virtualsat-console
 ```
 
-This creates an interactive console with which to command the satellite (and eventually groundstation).
+This creates an interactive console with which to command the satellite (and later  groundstation).
 
-Play with the satellite using the commands shown. **You can press enter on a blank line to get telemetry**. Notice how power charges/discharges. Notice how Value can be generated. Notice what happens if you run out of power. Notice how telemetry is created and how you can schedule commands. 
+Start by entering `satellite` to get to the satellite menu. Then type '?' to show commands.
 
-You can visit http://localhost:5001/ to see current telemetry, and http://localhost:5001/history to see historical telemetry. Once you get a feel for how to optimally generate value, move on to the next level.
+Play with the satellite using the commands shown. **You can press enter on a blank line to get telemetry -- do this in-between other commands to see what the satellite is doing**. Try `value c` and then notice how power discharges. Try `power r` and notice how power regenerates. Try creating value until you run out of power. Try scheduling commands (using both relative and absolute times). 
+
+You can visit http://localhost:5001/ to see current telemetry, and http://localhost:5001/history to see historical telemetry. Once you get a feel for how the satellite works, quit the satellite container and move on to the next level.
 
 ## Level 2: Orbit (under development)
 
@@ -63,9 +65,11 @@ docker run --rm -it \
   miketwo/virtualsat
 ```
 
+Note the additional environmental parameter `USE_ORBIT_PARAMETERS`. Other env vars can be used to change the satellite name and orbit.
+
 Now that the satellite is in orbit, **it will only respond to commands when it is over a groundstation**. You will need to deploy a groundstation. 
 
-That can be done with the following:
+In a 3rd terminal, deploy a groundstation with the following:
 
 ```
 docker run --rm -it \
@@ -84,28 +88,38 @@ docker run --rm -it \
     miketwo/virtualsat-console
 ```
 
+You can command the groundstation to track a satellite. The console will ask you for a satellite name and the Two-Line Elements (TLEs). If you have not modified your orbital environment variables, the default satellite is:
+```
+STARLINK-24
+1 44238U 19029D   20366.78684316  .00004289  00000-0  24662-3 0  9998
+2 44238  52.9975  32.3246 0001305  89.7284 270.3857 15.14479195 87325
+```
+The TLEs must be copied exactly as shown. Enter the command `track`, then copy and paste the lines above in order.
 
-ToDo: Readme instructions for
-- Manual tracking/commanding
-- Add the satellite/gs/gateays to MT
+The telemetry will now show the groundstation tracking the satellite, along with information about the current/next pass. Depending on when you do this, you may be in a pass or not.
+
+===== END OF CURRENT DEMO =======
+
+ToDo: Readme instructions for...
+- Forwarding a command to the satellite during a pass
 - Scheduling commands and downlinking value
 - Monitoring telemetry
+- Adding everything to Major Tom to show how much easier it is. 
 
 ## Level 3: Many satellites. Tbd... 
 
-Goal: Launch 100 satellite and 10 groundstations. Manage the fleet using awesome tools. Optimize operations for the most value.
+Goal: Launch 100 satellite and 10 groundstations. Manage the fleet using an awesome mission control in the cloud. Optimize operations for the most value.
 
 ## Bonus Level 4: More challenges... 
 
-Many ideas here. Easy to go overboard. I'd like to do the absolute smallest change necessary to demonstrate the best features of Mission Control.
-- Varying rates of charge/discharge between sats
+**Future work**. Many ideas here. Easy to go overboard. I'd like to do the absolute smallest change necessary to demonstrate the best features of Mission Control.
+- Varying rates of charge/discharge between sats, or Sats with constraints (such as "no eclipse passes" or reduced storage)
 - Non-static state (constant draining)
 - Rate limits on generating/downloading value
 - New axis of consideration, like thermal or GS maintanence
 - Errors with mandatory diagnostic commanding. (Have to upload "diag1", "diag2", ... on different passes to get back to normal)
 - Phases of flight, such as checkout. (Demonstrate scriptability)
 - Performance optimizations (changing rates with "work")
-- Sats with constraints (such as "no eclipse passes" or reduced storage)
 
 
 # Console Reference
@@ -143,14 +157,6 @@ The "commands" `satellite` or `groundstation` will take you to the respective co
 
 ## Groundstation Console
 
-You can command the groundstation to track a satellite. The console will ask you for a satellite name and the Two-Line Elements (TLEs). If you have not modified your environment variables, the default satellite is:
-```
-STARLINK-24
-1 44238U 19029D   20366.78684316  .00004289  00000-0  24662-3 0  9998
-2 44238  52.9975  32.3246 0001305  89.7284 270.3857 15.14479195 87325
-```
-The TLEs must be copied exactly as shown.
-
 |Tracking |                       |
 |-------|--------------------------|
 |track  | input tracking information for the groundstation  |
@@ -165,3 +171,4 @@ The TLEs must be copied exactly as shown.
  - Logging instead of prints
  - General code cleanup
  - Automated testing
+ - Integration with MT

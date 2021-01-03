@@ -41,7 +41,7 @@ COMMANDS = {
 
 class MainMenu(Cmd):
     prompt = 'Console> '
-    intro = "Welcome! Are you talking to a satellite or groundstation?"
+    intro = "Welcome! Type ? to list commands. Please choose satellite or groundstation:"
 
     def do_exit(self, inp):
         print("Bye")
