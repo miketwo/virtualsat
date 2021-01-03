@@ -16,9 +16,10 @@ class CommunicationSubsystem():
         # cmd = base64.b64decode(aString)
         # data = json.loads(some_json)
         data = aDict
-        print("Got command for {}: {}".format(data['subsystem'], data))
         if data is None:
         	return
-
+        if not data.get("subsystem"):
+            raise SystemError("No subsystem specified for command.")
+        print("COMMS | Got command for {}".format(data['subsystem']))
         return self.dispatcher.dispatch(data['subsystem'], command=data)
 

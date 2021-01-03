@@ -2,10 +2,42 @@
 # -*- coding: utf-8 -*-
 from cmd import Cmd
 import requests
-from datetime import datetime
+from datetime import datetime,timedelta
 
 SAT_URL = "http://sat:5001/"
 GS_URL = "http://gs:5000/"
+
+COMMANDS = {
+    "satellite": {
+        "power": {
+            "r": {
+                "subsystem": "power",
+                "mode": "recharge"
+            },
+            "n": {
+                "subsystem": "power",
+                "mode": "normal"
+            },
+        },
+        "value": {
+            "c": {
+                "subsystem": "value", 
+                "value": "create"
+            },
+            "d": {
+                "subsystem": "value",  
+                "value": "download"
+            },            
+        },
+        "sched": {
+            "subsystem": "sched",
+        }
+    },
+    "groundstation": {
+        "track": {}
+    }
+}
+
 
 class MainMenu(Cmd):
     prompt = 'Console> '
@@ -28,6 +60,12 @@ class MainMenu(Cmd):
 
     def help_groundstation(self, s):
         print("Talk to the groundstation.")
+
+    # Short aliases
+    do_sat = do_satellite
+    help_sat = help_satellite
+    do_gs = do_groundstation
+    help_gs = help_groundstation
 
     def default(self, inp):
         if inp == 'x' or inp == 'q':
@@ -88,15 +126,12 @@ class SatelliteConsole(Cmd):
         print('Return to main menu. Shorthand: x q')
 
     def do_power(self, arg):
-        cmd = {"subsystem": "power"}
-        if arg == 'r':
-            cmd.update({ "mode": "recharge"})
-            res = requests.post(SAT_URL, json=cmd)
-        elif arg == 'n':
-            cmd.update({ "mode": "normal"})
-            res = requests.post(SAT_URL, json=cmd)
-        else:
+        cmd = COMMANDS["satellite"]["power"].get(arg)
+        if not cmd:
             self.help_power()
+        else:
+            res = requests.post(SAT_URL, json=cmd)
+            print(res.status_code)
 
     def help_power(self):
         print('''Adjust power mode.
@@ -104,16 +139,12 @@ class SatelliteConsole(Cmd):
             power n -- normal''')
 
     def do_value(self, arg):
-        cmd = {"subsystem": "value"}
-
-        actions = {
-            "c": {**cmd, "value": "create"},
-            "d": {**cmd,  "value": "download"},
-        }
-        if arg not in actions:
-            return self.help_value()
-        cmd = actions[arg]
-        requests.post(SAT_URL, json=cmd)
+        cmd = COMMANDS["satellite"]["value"].get(arg)
+        if not cmd:
+            self.help_value()
+        else:
+            res = requests.post(SAT_URL, json=cmd)
+            print(res.status_code)
 
     def help_value(self):
         print('''value subsystem:
@@ -121,24 +152,49 @@ class SatelliteConsole(Cmd):
             value d - download value''')
 
     def do_sched(self, arg):
-        cmd = {
-            "subsystem": "sched",
-            "time": str(datetime.utcnow().timestamp() + 10),
-            "command": {
-                "subsystem": "power",
-                "mode": "recharge"
+        # sched TIME SUBSYSTEM CMD
+        self._sched_helper(arg, relative=False)
+
+    def help_sched(self):
+        print("""Scheduling a command:
+            sched <UTC TIME> <SUBSYSTEM> <CMD>
+
+            Example:
+            sched 1609459200 power r  -- sets power to recharge at midnight on New Year's 2021
+            """)
+
+    def do_rsched(self, arg):
+        # rsched DELTA_TIME_SECONDS SUBSYSTEM CMD
+        self._sched_helper(arg, relative=True)
+
+    def _sched_helper(self, arg, relative):
+        try:
+            time, subsystem, cmd = arg.split()
+            if relative:
+                dt = datetime.utcnow() + timedelta(seconds=int(time))
+            else:
+                dt = datetime.utcfromtimestamp(int(time))
+            subcommand = COMMANDS['satellite'][subsystem][cmd]
+            send_cmd = {
+                "subsystem": "sched",
+                "time": str(dt.timestamp()),
+                "command": subcommand
             }
-        }
-        # if arg not in actions:
-            # return self.help_value()
-        res = requests.post(SAT_URL, json=cmd)
+        except KeyError as e:
+            print("Command '{} {}' not found.".format(subsystem, cmd))
+            return
+        except Exception as e:
+            print(e)
+            return
+        res = requests.post(SAT_URL, json=send_cmd)        
 
-    def do_ping(self, inp):
-        print("Tbd.... ping sat")
+    def help_rsched(self):
+        print("""Scheduling a command:
+            sched <DELTA_TIME_SECONDS> <SUBSYSTEM> <CMD>
 
-    def help_ping(self):
-        print('''Simple Ping
-            ping - ping the satellite''')
+            Example:
+            sched 10 power r  -- sets power to recharge in 10 seconds
+            """)
 
     def emptyline(self):
         res = requests.get(SAT_URL)

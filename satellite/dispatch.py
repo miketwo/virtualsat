@@ -28,5 +28,6 @@ class DispatchSubsystem():
         # else:
         #     errmsg = "ERROR: No subsystem registered to handle '{}'".format(subsystem)
         #     raise SystemError(errmsg)
+        print("DISPATCH | Sending command to {}".format(subsystem))
         return dispatcher.send(signal=subsystem, sender=self, command=command)
 

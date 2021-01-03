@@ -44,7 +44,7 @@ docker run --rm -it \
 
 This creates an interactive console with which to command the satellite (and eventually groundstation).
 
-Play with the satellite using the commands shown. **You can press enter on a blank line to get telemetry**. Notice how power charges/discharges. Notice how Value can be generated. Notice how if you run out of power, you lose all stored value and the reboot counter increments. Notice how telemetry is created. 
+Play with the satellite using the commands shown. **You can press enter on a blank line to get telemetry**. Notice how power charges/discharges. Notice how Value can be generated. Notice what happens if you run out of power. Notice how telemetry is created and how you can schedule commands. 
 
 You can visit http://localhost:5001/ to see current telemetry, and http://localhost:5001/history to see historical telemetry. Once you get a feel for how to optimally generate value, move on to the next level.
 
@@ -83,6 +83,7 @@ docker run --rm -it \
     --network VirtualSatNet \
     miketwo/virtualsat-console
 ```
+
 
 ToDo: Readme instructions for
 - Manual tracking/commanding
@@ -136,7 +137,9 @@ The "commands" `satellite` or `groundstation` will take you to the respective co
 
 |Scheduling (TBD) |                       |
 |-------|--------------------------|
-|s START_TIME CMD  | schedule any other command at START TIME (unix time seconds)   |
+|sched START_TIME CMD  | schedule a command at START TIME (unix time) Ex: `sched 1609459200 power r`  -- sets power to recharge at midnight on New Year's 2021 |
+|rsched DELTA_SEC CMD  | for covenience, schedule commands at a RELATIVE TIME. Ex: `rsched 10 value c` -- create value in 10 seconds|
+
 
 ## Groundstation Console
 

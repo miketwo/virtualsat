@@ -24,21 +24,23 @@ class SchedulerSubsystem():
     def exec(self, command):
         '''
         Expecting something like:
-            {"command": {
+            {
+            "time": (utc timestamp)
+            "command": {
                 "subsystem": "power"
-                "mode": ""}
-             ""
+                "mode": "r"
+                }
             }
         '''
-        print("rcvd {}".format(command))
+        print("SCHEDULER | Processing command")
         if "time" in command and "command" in command:
             subsystem = command["command"]["subsystem"]
-            subsystem = command["command"]
+            subcommand = command["command"]
             target_datetime = datetime.utcfromtimestamp(int(float((command["time"]))))
-            self.schedule_command(subsystem, command, target_datetime)
+            self.schedule_command(subsystem, subcommand, target_datetime)
             return self.get_tlm()
         else:
-            errmsg = "Unable to execute command {}".format(command)
+            errmsg = "SCHEDULER | Unable to execute command {}".format(command)
             raise ValueError(errmsg)
 
     def schedule_command(self, subsystem, command, target_datetime):
