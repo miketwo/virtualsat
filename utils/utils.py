@@ -11,7 +11,7 @@ def create_sat_from_env():
     The satellite will be orbiting if ORBIT=TRUE.
     Otherwise the satellite will act as a FlatSat.
     '''
-    if os.getenv("ORBIT", "FALSE") == "TRUE":
+    if os.getenv("USE_ORBIT_PARAMETERS", "FALSE") == "TRUE":
         for envar in ["SATNAME", "TLE1", "TLE2"]:
             if os.getenv(envar) is None:
                 raise NameError("{} must be specified as an environment variable.".format(envar))
