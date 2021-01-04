@@ -1,0 +1,6 @@
+# Automated Testing on Docker Hub
+
+services:
+  sut:
+    build: Dockerfile.sat
+    command: pytest --verbose --capture=no --cache-clear
