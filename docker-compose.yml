@@ -1,20 +1,32 @@
 services:
   sat:
-    build: Dockerfile.sat
+    build:
+      context: .
+      dockerfile: Dockerfile.sat
+    networks:
+      - network1
     ports:
       - "5001:5001"
-    links:
-      - gs
-      - console
+
+  sat2:
+    build:
+      context: .
+      dockerfile: Dockerfile.sat
+    networks:
+      - network1
+    ports:
+      - "5002:5001"
+
   gs:
-    build: Dockerfile.gs
+    build:
+      context: .
+      dockerfile: Dockerfile.gs
+    networks:
+      - network1
     ports:
       - "5000:5000"
-    links:
-      - sat
-      - console
-  console:
-    build: Dockerfile.console
-    links:
-      - sat
-      - gs
+
+
+networks:
+  network1:
+    name: VirtualSatNet

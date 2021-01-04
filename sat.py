@@ -44,14 +44,23 @@ def index():
             return str(e), 400
     return ({}, 204)
 
-@app.route('/radio', methods=["GET", "POST"])
+
+@app.route('/radio', methods=["POST"])
 def radio():
-    return "tbd radio comms to/from gs"
+    try:
+        res = sat.radio.deserialize(request.json)
+        if res:
+            return "Success!"
+        else:
+            return "Bad request", 400
+    except SystemError as e:
+        return str(e), 400
 
 
 @app.route('/debug', methods=["GET"])
 def debug():
     return sat.status()
+
 
 @app.route('/history', methods=["GET"])
 def history():

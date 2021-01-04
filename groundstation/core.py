@@ -5,6 +5,7 @@ from pyorbital.orbital import Orbital
 import requests
 import base64
 
+
 class TrackingError(SystemError):
     pass
 
@@ -54,11 +55,11 @@ class Groundstation():
         else:
             HOURS_TO_CHECK = 12
             # returns a list of [(risetime, falltime, highest)]
-            passes = self._target.get_next_passes( 
-                utc_time=datetime.utcnow(), 
-                length=HOURS_TO_CHECK, 
+            passes = self._target.get_next_passes(
+                utc_time=datetime.utcnow(),
+                length=HOURS_TO_CHECK,
                 lon=self.location[1],
-                lat=self.location[0], 
+                lat=self.location[0],
                 alt=0)
             return passes
 
@@ -128,9 +129,10 @@ class Groundstation():
 
     ''' Passes a command through to the satellite '''
     def send_command(self, command):
+        print("GS | Received command: {}".format(command))
         if self.target is None:
             raise TrackingError("No satellite being tracked.")
-        if not self.target_in_view:
+        if not self.target_in_view():
             raise TrackingError("Satellite is not visible.")
         data = {**command, **self.get_pos()}
         res = requests.post(self.sat_url, json=data)

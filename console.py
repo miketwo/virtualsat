@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from cmd import Cmd
 import requests
-from datetime import datetime,timedelta
+from datetime import datetime, timedelta
 
 SAT_URL = "http://sat:5001/"
 GS_URL = "http://gs:5000/"
@@ -21,13 +21,13 @@ COMMANDS = {
         },
         "value": {
             "c": {
-                "subsystem": "value", 
+                "subsystem": "value",
                 "value": "create"
             },
             "d": {
-                "subsystem": "value",  
+                "subsystem": "value",
                 "value": "download"
-            },            
+            },
         },
         "sched": {
             "subsystem": "sched",
@@ -37,6 +37,19 @@ COMMANDS = {
         "track": {}
     }
 }
+
+
+def arg_to_sat_command(arg):
+    ''' Convert a typed line into a satellite json command.
+    Ex: power r --> {"subsystem": "power", "mode": "recharge"}
+    '''
+    try:
+        subsystem, cmd = arg.split()
+        command = COMMANDS['satellite'][subsystem][cmd]
+        return command
+    except KeyError:
+        print("Satellite command '{} {}' not found.".format(subsystem, cmd))
+        raise
 
 
 class MainMenu(Cmd):
@@ -98,6 +111,16 @@ class GroundstationConsole(Cmd):
         res = requests.post(GS_URL + "target", json=date)
         print(res)
 
+    def do_fwd(self, arg):
+        # Convert the arg into a command using satellite console
+        # send to gs
+        try:
+            cmd = arg_to_sat_command(arg)
+            res = requests.post(GS_URL, json=cmd)
+            print(res.text)
+        except Exception as e:
+            print(e)
+            pass
 
     def emptyline(self):
         res = requests.get(GS_URL)
@@ -186,7 +209,7 @@ class SatelliteConsole(Cmd):
         except Exception as e:
             print(e)
             return
-        res = requests.post(SAT_URL, json=send_cmd)        
+        res = requests.post(SAT_URL, json=send_cmd)
 
     def help_rsched(self):
         print("""Scheduling a command:
