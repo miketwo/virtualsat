@@ -1,6 +1,10 @@
 # Automated Testing on Docker Hub
 
+version: "3.6"
 services:
   sut:
-    build: Dockerfile.sat
-    command: pytest --verbose --capture=no --cache-clear
+    build:
+      context: .
+      dockerfile: Dockerfile.sat
+    command: "pytest --verbose --capture=no --cache-clear"
+
