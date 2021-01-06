@@ -36,9 +36,6 @@ def index():
                 return "Success!"
             else:
                 return "Bad request", 400
-        except groundstation.core.TrackingError as e:
-            print("Tracking error")
-            return str(e), 400
         except SystemError as e:
             return str(e), 400
         except Exception as e:
@@ -54,7 +51,7 @@ def target():
         app.logger.debug(request)
         filtered = {k:v for (k,v) in dict(request.json).items() if k in ["name", "line1", "line2"]}
         app.logger.debug(filtered)
-        gs.set_target(**filtered)
+        gs.tracking_system.set_target(**filtered)
         return "Successful post"
 
 
