@@ -49,7 +49,7 @@ def target():
         return json.dumps(gs.target)
     if request.method == 'POST':
         app.logger.debug(request)
-        filtered = {k:v for (k,v) in dict(request.json).items() if k in ["name", "line1", "line2"]}
+        filtered = {k:v for (k, v) in dict(request.json).items() if k in ["name", "line1", "line2"]}
         app.logger.debug(filtered)
         gs.tracking_system.set_target(**filtered)
         return "Successful post"

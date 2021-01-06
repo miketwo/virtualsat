@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-'''
-{'enabled': True, 'name': 'STL GroundStation', 'position': {'lat': 38.627, 'long': -90.1994},
-'time (utc)': 1609817810.266787,
-'tracking': {'azimuth': 205.92765729456244, 'elevation': 0, 'in pass': False, 'next pass': {'absolute': {'fall time': '01/05 03:47:44', 'highest': '01/05 03:41:58', 'rise time': '01/05 03:36:13'}, 'relative': {'fall time': '0:10:54.015939', 'highest': '0:05:07.882668', 'rise time': '-1 day, 23:59:23.216032'}}, 'tracking': True}}
-'''
 import pytest
 from datetime import datetime, timedelta
 from groundstation.track import TrackingSystem
@@ -18,7 +13,6 @@ dt = datetime.utcfromtimestamp(1609817765.0)  # 7 seconds before a pass
 
 @pytest.fixture
 def track():
-
     GS_LATITUDE = 38.6270
     GS_LONGITUDE = -90.1994
     track = TrackingSystem(GS_LATITUDE, GS_LONGITUDE)

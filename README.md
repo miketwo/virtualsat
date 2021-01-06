@@ -79,7 +79,7 @@ docker run --rm -it \
   miketwo/virtualsat-gs
 ```
 
-### Satellite Operations in Orbit
+### Satellite Tracking
 
 In order to command the satellite in orbit, there are 2 steps:
  - Command a groundstation to track the satellite
@@ -140,12 +140,14 @@ The groundstation telemetry will now show the groundstation tracking the satelli
 
 ```
 
+### Satellite Operations
+
+Once a pass has started, you will be able to command the satellite. All satellite commands are possible just by prepending with `fwd`. For example, `fwd power r` sets the power to recharge mode. `fwd value c` creates value.
+
+
 ===== END OF CURRENT DEMO =======
 
 ToDo: Readme instructions for...
-- Forwarding a command to the satellite during a pass
-- Scheduling commands and downlinking value
-- Monitoring telemetry
 - Adding everything to Major Tom to show how much easier it is.
 
 ## Level 3: Many satellites. Tbd...

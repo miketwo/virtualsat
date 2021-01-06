@@ -47,6 +47,7 @@ class TrackingSystem():
         self.target = Orbital(name, line1=line1, line2=line2)
         self._recalc_passes()
         self._recalc_pointing()
+        return self
 
     def clear_target(self):
         self.target = None

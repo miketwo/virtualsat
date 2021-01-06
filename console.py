@@ -209,7 +209,7 @@ class SatelliteConsole(Cmd):
         except Exception as e:
             print(e)
             return
-        res = requests.post(SAT_URL, json=send_cmd)
+        return requests.post(SAT_URL, json=send_cmd)
 
     def help_rsched(self):
         print("""Scheduling a command:

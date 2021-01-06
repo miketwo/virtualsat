@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
-'''
-
-'''
 import pytest
 from enum import Enum
-from unittest.mock import Mock
 from utils import command
 import json
 
