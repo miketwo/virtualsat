@@ -6,13 +6,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 class PowerSubsystem():
-    MAX_POWER = 100
+    MAX_POWER = 3000
     MIN_POWER = 0
     DRAIN_RATE = 0
-    CHARGE_RATE = 1
+    CHARGE_RATE = 30
     ACTIVITY_POWER_DRAIN = {
-        "value": 10,
-        "download": 10
+        "value": 300,
+        "download": 1
     }
 
     def __init__(self, **kwargs):
@@ -20,7 +20,7 @@ class PowerSubsystem():
         logger.info("Initilizing Power Subsystem")
         self.scheduler = kwargs.get("scheduler", BackgroundScheduler())
         self.scheduler.start()
-        self._power = self.MAX_POWER
+        self.power = self.MAX_POWER
         self._mode = 'normal'
         self._reboot_counter = 0
         self.scheduler.add_job(self.update, 'interval', seconds=1)
@@ -28,19 +28,6 @@ class PowerSubsystem():
 
     def __str__(self):
         return "Power Subsystem"
-
-    @property
-    def power(self):
-        return self._power
-
-    @power.setter
-    def power(self, value):
-        if value > self.MAX_POWER:
-            self._power = self.MAX_POWER
-        elif value < self.MIN_POWER:
-            self._power = self.MIN_POWER
-        else:
-            self._power = value
 
     @property
     def mode(self):
@@ -74,7 +61,7 @@ class PowerSubsystem():
     def get_tlm(self):
         return {
             "mode": self._mode,
-            "power": self._power,
+            "power": self.power,
             "reboots": self._reboot_counter,
         }
 
@@ -91,13 +78,13 @@ class PowerSubsystem():
     def update(self):
         if self._mode == "recharge" and self.power < self.MAX_POWER:
             self.power += self.CHARGE_RATE
-        elif self._mode == "normal" and self.power > 0:
+        elif self._mode == "normal" and self.power >= 0:
             self.power -= self.DRAIN_RATE
         else:
             None
 
         # Reset if out of power
-        if self.power <= 0:
+        if self.power < 0:
             self.power = 0
             self.mode = 'recharge'
             self._reboot_counter += 1

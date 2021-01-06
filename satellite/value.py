@@ -19,7 +19,7 @@ quickconnect(debug_listener)
 
 
 class ValueSubsystem():
-    MAX_VALUE = 10
+    MAX_VALUE = 10000
 
     def __init__(self, power_subsystem):
         super().__init__()
