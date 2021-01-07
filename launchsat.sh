@@ -12,7 +12,7 @@ then
       -e USE_ORBIT_PARAMETERS=TRUE \
       satellite
 else
-    docker run --rm -d \
+    docker run --rm -it \
     	--name sat \
     	--network VirtualSatNet \
     	satellite

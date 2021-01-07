@@ -78,8 +78,8 @@ class TestDefinitialization():
         # Instantiate for comparison
         sub = SubsystemField(Subsystem.power)
         res = ResultField(Subsystem.power)
-        print(sub)
-        print(res)
+        # print(sub)
+        # print(res)
         # assert res == sub
 
     def test_command_from_json_definition(self):
@@ -99,4 +99,4 @@ class TestDefinitialization():
         cmd = CommandClass(Subsystem.power, PowerMode.recharge)
         cmd = CommandClass(PowerMode.recharge, Subsystem.sched)
 
-        print(cmd)
+        # print(cmd)

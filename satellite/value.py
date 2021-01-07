@@ -3,20 +3,6 @@ import collections
 from pydispatch import dispatcher
 from functools import partial
 
-# debug listener, prints sender and params
-def debug_listener(sender, **kwargs):
-    print("[DEBUG] '{}' sent data '{}'".format(
-        sender,
-        ", ".join([
-            "{} => {}".format(key, value) for key, value in kwargs.items()
-        ]))
-    )
-quickconnect = partial(
-    dispatcher.connect,
-    signal="GLOBAL",
-    sender=dispatcher.Any)
-quickconnect(debug_listener)
-
 
 class ValueSubsystem():
     MAX_VALUE = 10000
@@ -29,7 +15,10 @@ class ValueSubsystem():
         self._value_counter = 1
         self._download_counter = 0
         self._lost_counter = 0
-        quickconnect(self.handle_signals)
+        dispatcher.connect(
+            self.handle_signals,
+            signal="GLOBAL",
+            sender=dispatcher.Any)
 
     @property
     def value(self):
@@ -52,11 +41,10 @@ class ValueSubsystem():
                 "clear": self.clear
         }
         if "value" in command.keys():
-            cmdlist[command["value"]]()
+            return cmdlist[command["value"]]()
         else:
             errmsg = "Unable to execute command {}".format(command)
             raise ValueError(errmsg)
-        return True
 
     def clear(self):
         self._value.clear()
@@ -67,18 +55,21 @@ class ValueSubsystem():
 
     def download(self):
         if self.pwr.mode != "normal":
-            errmsg = "ERROR: Must be in normal power mode to download value"
+            errmsg = "Must be in normal power mode to download value"
             raise SystemError(errmsg)
         if len(self._value) == 0:
-            errmsg = "ERROR: No value to download"
+            errmsg = "No value to download"
             raise SystemError(errmsg)
         self.pwr.take_action('value')
         self._value.pop()
         self._download_counter += 1
 
     def create_value(self):
+        print("="*40)
+        print(self.pwr.mode)
         if self.pwr.mode != "normal":
-            errmsg = "ERROR: Must be in normal power mode to create value"
+            print("RAISING ERROR")
+            errmsg = "Must be in normal power mode to create value"
             raise SystemError(errmsg)
         self.pwr.take_action('value')
         name = "Value{}".format(self._value_counter)

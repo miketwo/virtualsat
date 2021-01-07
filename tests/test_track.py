@@ -31,7 +31,7 @@ def test_tracking(track):
 def test_postconditions_before_pass(track):
     track.set_target(satname, line1, line2)
 
-    print(track.info())
+    # print(track.info())
     assert track.tracking() is True
     assert track.in_pass() is False
     assert track.target_in_view() is False
@@ -43,7 +43,7 @@ def test_postconditions_during_pass(track):
     track._DT_FOR_TEST += timedelta(seconds=30)
     track.set_target(satname, line1, line2)
 
-    print(track.info())
+    # print(track.info())
     assert track.tracking() is True
     assert track.in_pass() is True
     assert track.target_in_view() is True

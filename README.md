@@ -148,7 +148,7 @@ Once a pass has started, you will be able to command the satellite. All satellit
 ===== END OF CURRENT DEMO =======
 
 ToDo: Readme instructions for...
-- Adding everything to Major Tom to show how much easier it is.
+- Adding everything to Mission Control to show how much easier it is.
 
 ## Level 3: Many satellites. Tbd...
 
@@ -215,4 +215,4 @@ The "commands" `satellite` or `groundstation` will take you to the respective co
  - Logging instead of prints
  - General code cleanup
  - Automated testing
- - Integration with MT
+ - Integration with Mission Control

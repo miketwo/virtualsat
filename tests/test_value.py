@@ -10,16 +10,6 @@ from unittest.mock import Mock
 from satellite import value
 
 
-@pytest.fixture
-def valuesub(static_power_subsystem):
-    return value.ValueSubsystem(power_subsystem=static_power_subsystem)
-
-
-@pytest.fixture
-def valuesub_low_power(lower_power_subsystem):
-    return value.ValueSubsystem(power_subsystem=lower_power_subsystem)
-
-
 class TestTelemetry():
     def test_tlm_contains_everything(self, valuesub):
         tlm = valuesub.get_tlm()

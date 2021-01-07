@@ -39,7 +39,7 @@ def index():
             if res:
                 return "Success!"
             else:
-                return "Bad request", 400
+                return "There was a problem with that request", 400
         except SystemError as e:
             return str(e), 400
     return ({}, 204)

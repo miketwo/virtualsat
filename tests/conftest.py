@@ -4,6 +4,7 @@ import pytest
 from unittest.mock import Mock
 from datetime import datetime
 from satellite import power
+from satellite import value
 from groundstation.core import Groundstation
 
 
@@ -20,6 +21,37 @@ def lower_power_subsystem():
     sub = power.PowerSubsystem(scheduler=mock_scheduler)
     sub.configure({"power":1, "mode":"normal", "reboots": 0})
     return sub
+
+@pytest.fixture
+def recharging_power_subsystem():
+    mock_scheduler = Mock()
+    sub = power.PowerSubsystem(scheduler=mock_scheduler)
+    sub.configure({"power":100, "mode":"recharge", "reboots": 0})
+    return sub
+
+
+@pytest.fixture
+def valuesub():
+    mock_scheduler = Mock()
+    sub = power.PowerSubsystem(scheduler=mock_scheduler)
+    sub.configure({"power":100, "mode":"normal", "reboots": 0})
+    return value.ValueSubsystem(power_subsystem=sub)
+
+
+@pytest.fixture
+def valuesub_low_power():
+    mock_scheduler = Mock()
+    sub = power.PowerSubsystem(scheduler=mock_scheduler)
+    sub.configure({"power":1, "mode":"normal", "reboots": 0})
+    return value.ValueSubsystem(power_subsystem=sub)
+
+
+@pytest.fixture
+def valuesub_recharging_power():
+    mock_scheduler = Mock()
+    sub = power.PowerSubsystem(scheduler=mock_scheduler)
+    sub.configure({"power":100, "mode":"recharge", "reboots": 0})
+    return value.ValueSubsystem(power_subsystem=sub)
 
 
 @pytest.fixture

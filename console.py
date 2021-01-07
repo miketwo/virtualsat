@@ -52,6 +52,16 @@ def arg_to_sat_command(arg):
         raise
 
 
+def formatted_response(res):
+    if res:
+        try:
+            return str(res.json())
+        except Exception:
+            return res.text
+    else:
+        return "{} - {} - {}".format(res.status_code, res.reason, res.text)
+
+
 class MainMenu(Cmd):
     prompt = 'Console> '
     intro = "Welcome! Type ? to list commands. Please choose satellite or groundstation:"
@@ -109,7 +119,7 @@ class GroundstationConsole(Cmd):
             "line2": tle2,
         }
         res = requests.post(GS_URL + "target", json=date)
-        print(res)
+        print(formatted_response(res))
 
     def do_fwd(self, arg):
         # Convert the arg into a command using satellite console
@@ -117,7 +127,7 @@ class GroundstationConsole(Cmd):
         try:
             cmd = arg_to_sat_command(arg)
             res = requests.post(GS_URL, json=cmd)
-            print(res.text)
+            print(formatted_response(res))
         except Exception as e:
             print(e)
             pass
@@ -127,7 +137,7 @@ class GroundstationConsole(Cmd):
         if res.status_code == 204:
             pass
         elif res:
-            print(res.json())
+            print(formatted_response(res))
         else:
             pass
 
@@ -154,7 +164,7 @@ class SatelliteConsole(Cmd):
             self.help_power()
         else:
             res = requests.post(SAT_URL, json=cmd)
-            print(res.status_code)
+            print(formatted_response(res))
 
     def help_power(self):
         print('''Adjust power mode.
@@ -167,7 +177,7 @@ class SatelliteConsole(Cmd):
             self.help_value()
         else:
             res = requests.post(SAT_URL, json=cmd)
-            print(res.status_code)
+            print(formatted_response(res))
 
     def help_value(self):
         print('''value subsystem:
@@ -176,7 +186,8 @@ class SatelliteConsole(Cmd):
 
     def do_sched(self, arg):
         # sched TIME SUBSYSTEM CMD
-        self._sched_helper(arg, relative=False)
+        res = self._sched_helper(arg, relative=False)
+        print(formatted_response(res))
 
     def help_sched(self):
         print("""Scheduling a command:
@@ -188,7 +199,8 @@ class SatelliteConsole(Cmd):
 
     def do_rsched(self, arg):
         # rsched DELTA_TIME_SECONDS SUBSYSTEM CMD
-        self._sched_helper(arg, relative=True)
+        res = self._sched_helper(arg, relative=True)
+        print(formatted_response(res))
 
     def _sched_helper(self, arg, relative):
         try:
@@ -224,7 +236,7 @@ class SatelliteConsole(Cmd):
         if res.status_code == 204:
             pass
         elif res:
-            print(res.json())
+            print(formatted_response(res))
         else:
             pass
 

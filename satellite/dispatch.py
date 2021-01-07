@@ -23,11 +23,6 @@ class DispatchSubsystem():
         return dispatcher.connect(subsystem, signal=name, sender=dispatcher.Any)
 
     def dispatch(self, subsystem, command):
-        # if subsystem in self._SUBSYSTEMS:
-        #     return self._SUBSYSTEMS[subsystem].exec(command)
-        # else:
-        #     errmsg = "ERROR: No subsystem registered to handle '{}'".format(subsystem)
-        #     raise SystemError(errmsg)
         print("DISPATCH | Sending command to {}".format(subsystem))
         return dispatcher.send(signal=subsystem, sender=self, command=command)
 

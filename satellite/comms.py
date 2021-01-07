@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import base64
-import json
 
 
 class CommunicationSubsystem():
@@ -17,9 +16,8 @@ class CommunicationSubsystem():
         # data = json.loads(some_json)
         data = aDict
         if data is None:
-        	return
+            return
         if not data.get("subsystem"):
             raise SystemError("No subsystem specified for command.")
         print("COMMS | Got command for {}".format(data['subsystem']))
         return self.dispatcher.dispatch(data['subsystem'], command=data)
-
